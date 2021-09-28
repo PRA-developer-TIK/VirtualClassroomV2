@@ -1,57 +1,61 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import {Link} from "react-router-dom";
-import ProfileMenu from './ProfileMenu';
-import { useHistory } from 'react-router';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import {useLocalContext} from "../Context/context"
-import CreateClass from '../Home/CreateClass';
-import JoinClass from '../Home/JoinClass';
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import { Link } from "react-router-dom";
+import ProfileMenu from "./ProfileMenu";
+import { useHistory } from "react-router";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { useLocalContext } from "../Context/context";
+import CreateClass from "../Home/CreateClass";
+import JoinClass from "../Home/JoinClass";
 
-
-
-
-
-function NavbarHome({user}) {
+function NavbarHome() {
   //using dialogStates from context
-const {setCreateClassDialog,setJoinClassDialog}=useLocalContext();
+  const { setCreateClassDialog, setJoinClassDialog } = useLocalContext();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
 
+  //globalstates
+  const { loggedUser } = useLocalContext();
+
+  const handleClose = () => {
     setAnchorEl(null);
   };
-  const history=useHistory();
+  const history = useHistory();
   return (
-       <Box sx={{ flexGrow: 1 }}>
-      <AppBar  position="static">
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1}}>
-          <Link to="/"><img style={{width:"50px"}} src="https://www.pngrepo.com/png/237114/512/dummy-crash.png" alt="logo"/></Link>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link to="/">
+              <img
+                style={{ width: "50px" }}
+                src="https://www.pngrepo.com/png/237114/512/dummy-crash.png"
+                alt="logo"
+              />
+            </Link>
           </Typography>
-          {user?
-          <>
-          <Button
+          {loggedUser ? (
+            <>
+              <AddCircleOutlineOutlinedIcon
                 id="demo-positioned-button"
                 aria-controls="demo-positioned-menu"
                 aria-haspopup="true"
                 aria-expanded={open ? "true" : undefined}
                 onClick={handleClick}
+                style={{cursor:"pointer"}}
+                fontSize="large"
 
-                style={{backgroundColor:"#FFCA28"}}
-                
-              >
-                <AddCircleOutlineOutlinedIcon />
-              </Button>
+              />
+
               <Menu
                 id="demo-positioned-menu"
                 aria-labelledby="demo-positioned-button"
@@ -67,26 +71,40 @@ const {setCreateClassDialog,setJoinClassDialog}=useLocalContext();
                   horizontal: "left",
                 }}
               >
-                <MenuItem onClick={()=>{setCreateClassDialog(true);handleClose()}}>Add Class</MenuItem>
-                <MenuItem onClick={()=>{setJoinClassDialog(true);handleClose()}}>Join Class</MenuItem>
-              </Menu> 
-          
-          <ProfileMenu/>
-          <CreateClass/>
-          <JoinClass/>
-          </>
-          :
-          <>
-          <Button color="inherit" onClick={()=>history.push("/login")} > Login</Button>
-          </>
-          }
+                <MenuItem
+                  onClick={() => {
+                    setCreateClassDialog(true);
+                    handleClose();
+                  }}
+                >
+                  Add Class
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    setJoinClassDialog(true);
+                    handleClose();
+                  }}
+                >
+                  Join Class
+                </MenuItem>
+              </Menu>
+
+              <ProfileMenu />
+              <CreateClass />
+              <JoinClass />
+            </>
+          ) : (
+            <>
+              <Button color="inherit" onClick={() => history.push("/login")}>
+                {" "}
+                Login
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
-      
   );
 }
 
 export default NavbarHome;
-
-

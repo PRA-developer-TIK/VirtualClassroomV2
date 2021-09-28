@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogActions } from "@material-ui/core";
 import { FormControl, TextField, Button } from "@material-ui/core";
 import { useLocalContext } from "../Context/context";
-import useStyles  from "../../assets/styles/globalStyles/styles";
+import useStyles from "../../assets/styles/globalStyles/styles";
+import { v4 as uuidv4 } from "uuid";
 
 function CreateClass() {
+  //global imports states
   const {
     createClassDialog,
     setCreateClassDialog,
@@ -14,30 +16,40 @@ function CreateClass() {
   } = useLocalContext();
   const classes = useStyles();
 
+  //input states
   const [className, setClassName] = useState("");
   const [subject, setSuject] = useState("");
   const [domain, setDomain] = useState("");
 
+  //firebase details
+
   const handleSubmit = async (e) => {
-    console.log(className, subject, domain, loggedUser.uid, loggedUserMail);
+    console.log(className, subject, domain, loggedUserMail);
     e.preventDefault();
+    console.log("id is ", uuidv4());
+    console.log("timestamp");
+    const id = uuidv4();
 
     try {
       const addClass = await db
         .collection("CreatedClasses")
         .doc(loggedUserMail)
-        .collection("classes")
-        .add({
-          owner: loggedUserMail,
+        .collection("ClassC")
+        .doc(id)
+        .set({
+          code: id,
+          dateCreated: new Date().toISOString().substr(0, 10),
+          ownerMail: loggedUserMail,
           className: className,
           subject: subject,
           domain: domain,
-          id: loggedUser.uid,
+          ownerAvatarURL:loggedUser.photoURL,
+          enrolled: [],
         });
       setCreateClassDialog(false);
       console.log("class added", addClass);
     } catch (e) {
-      console.log(e);
+      alert(e);
     }
   };
 

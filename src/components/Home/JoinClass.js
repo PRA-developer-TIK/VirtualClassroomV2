@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -15,7 +15,8 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 
 import { useLocalContext } from "../Context/context";
-import  useStyles from "../../assets/styles/globalStyles/styles";
+import useStyles from "../../assets/styles/globalStyles/styles";
+import firebase from "@firebase/app-compat";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -35,43 +36,54 @@ export default function JoinClass() {
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
 
-  const [classExists, setClassExists] = useState(false);
-  const [joinedData, setJoinedData] = useState(false);
+  const [joinedData, setJoinedData] = useState({});
 
   const handleJoin = async (e) => {
     e.preventDefault();
     console.log(code, email);
 
     try {
-      const toJoinClass = await db
+      const toJoinClassRef = db
         .collection("CreatedClasses")
         .doc(email)
-        .collection("classes")
-        .doc(code)
-        .get();
+        .collection("ClassC")
+        .doc(code);
+
+      let toJoinClass = await toJoinClassRef.get();
 
       if (toJoinClass.exists && toJoinClass.owner !== loggedUser.email) {
         console.log("classFound ", toJoinClass.data());
-        setClassExists(true);
-        setJoinedData(toJoinClass.data());
-        setError(false);
-      } else {
-        setClassExists(false);
-        setError(true);
-        return;
-      }
+        let data = toJoinClass.data();
 
-      if (classExists) {
-        console.log("classFound adding data ", joinedData);
+        //updating the enrolled array in createdClasses to keep a track of enrolled students
+        toJoinClassRef.update({
+          enrolled: firebase.firestore.FieldValue.arrayUnion(loggedUserMail),
+        });
+
+        console.log(data);
+        setJoinedData(data);
+        setError(false);
         await db
           .collection("joinedClasses")
           .doc(loggedUserMail)
-          .collection("classes")
+          .collection("classesJ")
           .doc(code)
-          .set({
-            joinedData,
-          });
+          .set(
+            {
+              code: data.code,
+              dateCreated: data.dateCreated,
+              ownerMail: data.ownerMail,
+              ownerAvatarURL:data.ownerAvatarURL,
+              className: data.className,
+              subject: data.subject,
+              domain: data.domain,
+            },
+            { merge: true }
+          );
         setJoinClassDialog(false);
+      } else {
+        setError(true);
+        return;
       }
     } catch (e) {
       console.log(e);
@@ -97,11 +109,8 @@ export default function JoinClass() {
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-              Sound
+              Join Class
             </Typography>
-            <Button autoFocus color="inherit">
-              save
-            </Button>
           </Toolbar>
         </AppBar>
         <DialogContent>

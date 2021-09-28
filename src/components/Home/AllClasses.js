@@ -5,7 +5,7 @@ import { Grid, Container } from "@material-ui/core";
 import Paper from "@mui/material/Paper";
 
 import useStyles from "../../assets/styles/globalStyles/styles";
-function AllClasses() {
+function AllClasses({createdClasses,joinedClasses}) {
   const classes = useStyles();
   return (
     <Container className={classes.root}>
@@ -13,12 +13,25 @@ function AllClasses() {
         container
         spacing={1}
         direction="row"
-        justify="flex-start"
+        justifyContent="flex-start"
         alignItems="flex-start"
-      >
-        <Grid item xs={12} sm={4} md={3}>
-        <ClassCard/>
-        </Grid>
+      > 
+      
+        {
+          createdClasses.map((classData,index)=>(
+            <Grid key={index} item xs={12} sm={4} md={3}>
+            <ClassCard  classData={classData} />
+            </Grid>
+          ))
+        }
+        
+        {
+          joinedClasses.map((classData,index)=>(
+            <Grid key={index} item xs={12} sm={4} md={3}>
+            <ClassCard  classData={classData} />
+            </Grid>
+          ))
+        }
       </Grid>
       
     </Container>

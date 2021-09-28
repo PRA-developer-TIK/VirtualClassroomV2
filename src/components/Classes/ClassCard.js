@@ -11,32 +11,31 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import {Link,useHistory} from "react-router-dom"
 
-export default function ClassCard() {
+export default function ClassCard({classData}) {
   let date = new Date().toISOString().slice(0, 10)
   const history =useHistory();
   return (
-    <Card sx={{ maxWidth: 250 }}>
+    <Card sx={{ maxWidth: 350 ,backgroundColor:"#fefefz",}}
+    
+    >
       <CardHeader
-        avatar={<Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />}
-        title="Pratik Vartak"
-        subheader={date}
-      />
-      <CardMedia
-        component="img"
-        height="140"
-        image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRObUFXtEjRgU9ZY_P0CzWIF2oXFAV8CxwXCA&usqp=CAU"
-        alt="green iguana"
+        avatar={<Avatar alt="Remy Sharp" src={classData.ownerAvatarURL}/>}
+        title={classData.ownerMail.split("@")[0]}
+        subheader={classData.dateCreated}
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          Enrolled
+          {classData.className}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          About this classroom
+        {classData.domain}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+        {classData.subject}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small"  onclick={()=>history.push("/aClass")}><Link underline="none" to="/aClass" >Open</Link></Button>
+        <Button size="small"  onClick={()=>history.push(`/${classData.code}`)}>Open</Button>
       </CardActions>
     </Card>
   );

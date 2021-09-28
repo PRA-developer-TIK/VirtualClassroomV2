@@ -5,11 +5,15 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 import { useHistory } from 'react-router';
+import { useLocalContext } from '../Context/context';
 
 //firebase imports
-import {auth} from "../../firebase/config";
+
 
 export default function AccountMenu() {
+  //importing global states
+  const {db,auth,loggedUser}=useLocalContext();
+
   const history=useHistory();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -26,7 +30,7 @@ export default function AccountMenu() {
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
-            <Avatar sx={{ width: 32, height: 32 }} src="https://www.pngrepo.com/png/237114/512/dummy-crash.png">M</Avatar>
+            <Avatar sx={{ width: 32, height: 32 }} src={loggedUser.photoURL}>M</Avatar>
           </IconButton>
       </Box>
       <Menu
