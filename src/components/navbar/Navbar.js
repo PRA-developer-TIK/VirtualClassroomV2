@@ -7,14 +7,29 @@ import Button from '@mui/material/Button';
 import {Link} from "react-router-dom";
 import ProfileMenu from './ProfileMenu';
 import { useHistory } from 'react-router';
-import { AddCircleOutlineSharp } from '@mui/icons-material';
-//firebase imports
-import db,{auth} from "../../firebase/config";
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import {useLocalContext} from "../Context/context"
+import CreateClass from '../Home/CreateClass';
+import JoinClass from '../Home/JoinClass';
+
 
 
 
 
 function NavbarHome({user}) {
+  //using dialogStates from context
+const {setCreateClassDialog,setJoinClassDialog}=useLocalContext();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+
+    setAnchorEl(null);
+  };
   const history=useHistory();
   return (
        <Box sx={{ flexGrow: 1 }}>
@@ -25,14 +40,40 @@ function NavbarHome({user}) {
           </Typography>
           {user?
           <>
-          {user.displayName==="teacher"?
-          <Button style={{backgroundColor:"#FFCA28"}}  onClick={()=>history.push("/joinOrCreate")} > CreateClass <AddCircleOutlineSharp/></Button>
-          :
-          <Button style={{backgroundColor:"#FFCA28"}} onClick={()=>history.push("/joinOrCreate")} > Join Class <AddCircleOutlineSharp/></Button>
+          <Button
+                id="demo-positioned-button"
+                aria-controls="demo-positioned-menu"
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+                onClick={handleClick}
 
-          }
+                style={{backgroundColor:"#FFCA28"}}
+                
+              >
+                <AddCircleOutlineOutlinedIcon />
+              </Button>
+              <Menu
+                id="demo-positioned-menu"
+                aria-labelledby="demo-positioned-button"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+              >
+                <MenuItem onClick={()=>{setCreateClassDialog(true);handleClose()}}>Add Class</MenuItem>
+                <MenuItem onClick={()=>{setJoinClassDialog(true);handleClose()}}>Join Class</MenuItem>
+              </Menu> 
           
           <ProfileMenu/>
+          <CreateClass/>
+          <JoinClass/>
           </>
           :
           <>
@@ -47,3 +88,5 @@ function NavbarHome({user}) {
 }
 
 export default NavbarHome;
+
+

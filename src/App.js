@@ -10,7 +10,6 @@ import { BrowserRouter as Router, Switch ,Route} from "react-router-dom";
 //components import
 import Navbar from "./components/navbar/Navbar";
 import Login from "./components/userDetails/Login"
-import JoinCreateClass from "./components/Home/JoinCreateClass";
 import AllClasses from "./components/Home/AllClasses"
 import useStyles from "./assets/styles/globalStyles/styles";
 import Class from "./components/teacher/Class"
@@ -53,10 +52,6 @@ function App() {
         </Route>
         <Route path="/updateProf" exact>
           <UpdateProf   />
-        </Route>
-        <Route path="/joinOrCreate" exact>
-          <JoinCreateClass role={role}  />
-
         </Route>
         <Route path="/login" exact>
           <Login />

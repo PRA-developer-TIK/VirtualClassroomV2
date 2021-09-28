@@ -11,6 +11,19 @@ const useStyles = makeStyles((theme) => ({
     margin: "5px",
     width: "30%",
   },
+  createInputFields: {
+    margin: "5px",
+    width: "100%",
+  },
+  //joinClass
+  joinClass: {
+    border: "1px solid",
+    textAlign: "center",
+    padding: "22px",
+    margin: "1%",
+    borderRadius: "20px",
+    width: "40%",
+  },
   forms: {
     display: "flex",
     alignItems: "center",
