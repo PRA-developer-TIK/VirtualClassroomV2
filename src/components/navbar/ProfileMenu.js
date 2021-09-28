@@ -63,9 +63,6 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={()=>{history.push("/updateProf")}}>
-          <Avatar  /> My account 
-        </MenuItem>
         <MenuItem>
           <Avatar /> Home
         </MenuItem>

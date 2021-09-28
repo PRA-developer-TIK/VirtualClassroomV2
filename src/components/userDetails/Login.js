@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useHistory } from "react-router";
-import { TextField } from "@mui/material";
-import { FormControl, Button } from "@mui/material";
+import {Box,Button } from "@mui/material";
 import useStyles from "../../assets/styles/globalStyles/styles";
-
+import GoogleIcon from '@mui/icons-material/Google';
+import {useLocalContext} from "../Context/context"
 //importing firebase functions
 import { auth, db } from "../../firebase/config";
+
 
 function Login(props) {
   const classes = useStyles();
@@ -13,6 +14,8 @@ function Login(props) {
 
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+
+  const {login}=useLocalContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,43 +33,31 @@ function Login(props) {
   };
 
   return (
-    <form
-      onSubmit={(e) => {
-        handleSubmit(e);
-      }}
-    >
-      <h1 style={{ textAlign: "center" }}>HELLO PLEASE LOGIN </h1>
-
-      <FormControl noValidate autoComplete="on" className={classes.forms}>
-        <TextField
-          label="email"
-          type="email"
-          variant="outlined"
-          color="primary"
-          name="email"
-          className={classes.inputFields}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          label="password"
-          type="password"
-          variant="outlined"
-          color="primary"
-          name="password"
-          className={classes.inputFields}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <Button
+    <div>
+      <img style={{display:"flex",margin:"auto",marginTop:"10%",width:"10%"}} src="https://www.pngrepo.com/png/237114/512/dummy-crash.png" alt="logo"/>
+    
+    <Box  sx={{
+      width: "15%",
+      padding: "1%",
+      borderRadius: 10,
+      m: "auto",
+      mt: 1,
+    }}
+    boxShadow={6}>
+    
+    
+    
+     <Button
           type="submit"
           variant="contained"
           color="primary"
-          className={classes.inputFields}
+          style={{width:"100%"}}
+          onClick={()=>login(),history.push("/allClasses")}
         >
-          Login
+          Login With Google <GoogleIcon/>
         </Button>
-      </FormControl>
-    </form>
+    </Box>
+    </div>
   );
 }
 

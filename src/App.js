@@ -11,10 +11,7 @@ import { BrowserRouter as Router, Switch ,Route} from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import Login from "./components/userDetails/Login"
 import AllClasses from "./components/Home/AllClasses"
-import useStyles from "./assets/styles/globalStyles/styles";
 import Class from "./components/teacher/Class"
-import UpdateProf from "./components/userDetails/UpdateProf";
-
 //import firebase
 import db,{auth} from "./firebase/config"
 
@@ -49,9 +46,6 @@ function App() {
         <Route path="/allClasses" exact>
           <AllClasses   />
 
-        </Route>
-        <Route path="/updateProf" exact>
-          <UpdateProf   />
         </Route>
         <Route path="/login" exact>
           <Login />
