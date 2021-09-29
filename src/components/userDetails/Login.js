@@ -61,7 +61,7 @@ function Login(props) {
           style={{ width: "100%" }}
           onClick={() => {
             login();
-            history.push("/allClasses");
+            history.push("/");
           }}
         >
           Login With Google <GoogleIcon />

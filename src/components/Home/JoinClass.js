@@ -17,10 +17,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useLocalContext } from "../Context/context";
 import useStyles from "../../assets/styles/globalStyles/styles";
 import firebase from "@firebase/app-compat";
+import { useHistory } from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
+
 
 export default function JoinClass() {
   const {
@@ -28,9 +31,10 @@ export default function JoinClass() {
     setJoinClassDialog,
     loggedUser,
     loggedUserMail,
-    db,
+    db,auth
   } = useLocalContext();
   const classes = useStyles();
+  const history =useHistory();
 
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -131,7 +135,7 @@ export default function JoinClass() {
                 <Avatar alt="Remy Sharp" src={loggedUser?.photoURL} />
                 <h5 style={{ margin: "10px" }}>{loggedUser?.displayName}</h5>
               </div>
-              <Button variant="outlined">Logout</Button>
+              <Button onClick={()=>{auth.signOut();history.push("/login")}} variant="outlined">Logout</Button>
             </div>
             <div className={classes.joinClass}>
               <h3>Class Code</h3>

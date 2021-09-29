@@ -7,7 +7,7 @@ import { Container } from "@mui/material";
 import Module from "./Module"
 import Announcement from "../Announcement/Announcement"
 import FAQ from "../FAQs/FAQ"
-function Class() {
+function Class({classData}) {
   const classes = useStyles();
   const [value, setValue] = React.useState("module");
   console.log(value);
@@ -28,7 +28,7 @@ function Class() {
     </Box>
     <Container>
    { value==="module" ?
-    <Module/> :value==="announce"?<Announcement/> :value==="grades"?"grades":value==="FAQs"?<FAQ/>:null } 
+    <Module/> :value==="announce"?<Announcement classData={classData}/> :value==="grades"?"grades":value==="FAQs"?<FAQ/>:null } 
     
     </Container>
 

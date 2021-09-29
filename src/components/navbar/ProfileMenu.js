@@ -70,7 +70,7 @@ export default function AccountMenu() {
         <MenuItem>
           <Avatar /> Home
         </MenuItem>
-        <MenuItem onClick={()=>{history.push("/allClasses")}}>
+        <MenuItem onClick={()=>{history.push("/")}}>
           <Avatar /> My Classes
         </MenuItem>
         <MenuItem onClick={()=>{auth.signOut();history.push("/login")}}>

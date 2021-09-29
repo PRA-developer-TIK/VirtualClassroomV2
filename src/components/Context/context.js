@@ -44,7 +44,7 @@ export const ContextProvider=({children})=>{
         joinClassDialog,
         setJoinClassDialog,
         login,logOut,
-        loggedUser,loggedUserMail,db,auth
+        loggedUser,loggedUserMail,db,auth,storage
       };
     return (
         <AddContext.Provider value={value}>

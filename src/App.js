@@ -70,8 +70,11 @@ function App() {
               </Route>
             ))}
 
-            <Route path="/allClasses" exact>
+            <Route path="/" exact>
+            {loggedUser?
               <AllClasses  createdClasses={createdClasses} joinedClasses={joinedClasses}/>
+              :null}
+
             </Route>
             <Route path="/login" exact>
               <Login />
