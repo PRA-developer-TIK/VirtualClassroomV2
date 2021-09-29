@@ -17,6 +17,7 @@ import { useLocalContext } from "./components/Context/context";
 function App() {
   const [createdClasses, setCreatedClasses] = useState([]);
   const [joinedClasses, setJoinedClasses] = useState([]);
+  const [modules,setModules]=useState([]);
 
   const { db, auth, loggedUser, loggedUserMail } = useLocalContext();
 
@@ -30,6 +31,8 @@ function App() {
         .onSnapshot((snapshot) => {
           setCreatedClasses(snapshot.docs.map((doc) => doc.data()));
         });
+
+        
 
       return () => unsubscribe();
     }

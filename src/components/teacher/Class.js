@@ -1,5 +1,5 @@
 import useStyles from "../../assets/styles/globalStyles/styles";
-import * as React from "react";
+import React,{useState,useEffect} from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -7,10 +7,29 @@ import { Container } from "@mui/material";
 import Module from "./Module"
 import Announcement from "../Announcement/Announcement"
 import FAQ from "../FAQs/FAQ"
+import { useLocalContext } from "../Context/context";
 function Class({classData}) {
   const classes = useStyles();
+  const {loggedUserMail,db} =useLocalContext();
   const [value, setValue] = React.useState("module");
+  const [modules,setModules]=React.useState([]);
   console.log(value);
+
+  useEffect(()=>{
+    if(classData){
+      console.log("classData",classData)
+      let unsubscribe= db
+      .collection("CreatedClasses")
+      .doc(loggedUserMail!==classData.ownerMail? classData.ownerMail :loggedUserMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("modules")
+      .onSnapshot((snap) => {
+        setModules(snap.docs.map((doc) => doc.data()));
+      });
+      return () => unsubscribe();
+    }
+  },[classData]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -28,7 +47,7 @@ function Class({classData}) {
     </Box>
     <Container>
    { value==="module" ?
-    <Module/> :value==="announce"?<Announcement classData={classData}/> :value==="grades"?"grades":value==="FAQs"?<FAQ/>:null } 
+    <Module modules={modules} classData={classData}/> :value==="announce"?<Announcement classData={classData}/> :value==="grades"?"grades":value==="FAQs"?<FAQ/>:null } 
     
     </Container>
 

@@ -26,10 +26,13 @@ export const ContextProvider=({children})=>{
                 setLoggedUser(user);
                 setLoggedUserMail(user.email)
                 console.log(user);
+                
+                
             }else{
                 setLoggedUser(null);
                 setLoggedUserMail(null)
             }
+
 
         })
 

@@ -1,168 +1,205 @@
-import React,{useState} from "react";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import { Box,Modal,TextField,Container} from "@material-ui/core";
+import React, { useState, useEffect } from "react";
+import { Box, TextField, Container } from "@material-ui/core";
 import useStyles from "../../assets/styles/globalStyles/styles";
-export default function Moduke() {
+import { useLocalContext } from "../Context/context";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import AllModules from "./AllModules";
+import firebase from "@firebase/app-compat";
+
+export default function Module({ modules, classData }) {
   const classes = useStyles();
 
-  const [open, setOpen] = React.useState(false);
-  const [inputText,setInputText]=useState("");
-  
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  const handleChange=()=>{};
+  const { loggedUserMail, db, storage } = useLocalContext();
 
-  const handleUpload=(e)=>{
-    console.log(inputText)
+  const [inputTitle, setInputTitle] = useState("");
+  const [inputLink, setInputLink] = useState("");
+  console.log(inputTitle,inputLink)
 
-  }
+  //module select
+  const [module, setModule] = React.useState("");
 
-  const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
+  const handleChangeModule = (event) => {
+    setModule(event.target.value);
+    console.log(event.target.value);
   };
 
-  const QModal=()=>{
-      return(
-    <Modal
-    open={open}
-    onClose={handleClose}
-    aria-labelledby="modal-modal-title"
-    aria-describedby="modal-modal-description"
-  >
-    <Box sx={style}>
-    <TextField
-          id="filled-multiline-static"
-          label="Multiline"
-          fullWidth
-          multiline
-          rows={4}
-          variant="filled"
-          defaultValue="Default Value"
-        />
-    
-    <button onClick={(e)=>console.log(inputText)} style={{ padding: "1%",float:"right" }}>Post</button>
-    </Box>
-  </Modal>)
+  const [file, setFile] = useState(null);
+  const [fileType, setFileType] = useState(null);
 
-  }
-  let arr=[1,2,3,4,5];
+  const handleChangeFile = (e) => {
+    setFileType(e.target.files[0].name.split(".").slice(-1)[0]);
+    setFile(e.target.files[0]);
+  };
+
+  const handleUpload = async (e) => {
+    if (file) {
+      const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
+      let url;
+      uploadFile.on("state_changed", async (snapshot) => {
+        url = await storage
+          .ref(`${fileType}s`)
+          .child(file.name)
+          .getDownloadURL();
+        console.log("code is", classData.code);
+        console.log(url);
+
+        let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("progress",progress)
+        if (progress === 100) {
+          try {
+            await db
+              .collection("CreatedClasses")
+              .doc(
+                loggedUserMail !== classData.ownerMail
+                  ? classData.ownerMail
+                  : loggedUserMail
+              )
+              .collection("ClassC")
+              .doc(classData.code)
+              .collection("modules")
+              .doc(module)
+              .update({
+                content: firebase.firestore.FieldValue.arrayUnion({
+                  fileURL: url,
+                  title: inputTitle,
+                  link: inputLink,
+                  avatarURL: classData.ownerAvatarURL,
+                }),
+              });
+          } catch (e) {
+            alert(e);
+          }
+        }
+      });
+    } else {
+      try {
+        await db
+          .collection("CreatedClasses")
+          .doc(
+            loggedUserMail !== classData.ownerMail
+              ? classData.ownerMail
+              : loggedUserMail
+          )
+          .collection("ClassC")
+          .doc(classData.code)
+          .collection("modules")
+          .doc(module)
+          .update({
+            content: firebase.firestore.FieldValue.arrayUnion({
+              fileUrl: null,
+              title: inputTitle,
+              link: inputLink,
+              avatarURL: classData.ownerAvatarURL,
+            }),
+          });
+      } catch (e) {
+        alert(e);
+      }
+    }
+  };
+
+  //adding module to database
+  const handleAddModule = async (e) => {
+    e.preventDefault();
+
+    let modCt = modules.length;
+    await db
+      .collection("CreatedClasses")
+      .doc(loggedUserMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("modules")
+      .doc(`module${++modCt}`)
+      .set({
+        moduleName: `module${modCt}`,
+        content: [],
+      });
+  };
+
   return (
     <Container>
-    <Box
-      sx={{
-        width: "80%",
-        border: "1px solid black",
-        padding: "2%",
-        borderRadius: 10,
-        m: "auto",
-        mt: 1,
-      }}
-      boxShadow={6}
-    >
-      <TextField
-          id="filled-multiline-static"
-          label="Multiline"
-          fullWidth
-          multiline
-          rows={4}
-          variant="filled"
-          defaultValue="Default Value"
-          onChange={(e)=>{setInputText(e.target.value)}}
-        />
-      <div style={{ padding: "2%" }}>
-        <input
-          onChange={handleChange}
-          variant="outlined"
-          color="primary"
-          type="file"
-        />
-
-        <div style={{ float: "right" }}>
-          <button className={classes.postBtn}> POST</button>
-          
-        </div>
-      </div>
-    </Box>
-
-   
-    
-    <div
-      style={{
-        width: "80%",
-        margin: "auto",
-        marginTop: "2%",
-        border: "1px solid black",
-        display:"block",
-        
-
-      }}
-    >
-  {arr.map((item,index)=>(
-    <Accordion
-      sx={{
-        mt: 1,
-      }}
-    >
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon onClick={()=>handleOpen()}/>}
-        aria-controls="panel1a-content"
-        id="panel1a-header"
-      >
-        <Typography sx={{ width: '33%', flexShrink: 0 }}>Accordion 1 </Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <ListItem
-          alignItems="flex-start"
-          style={{ border: "1px solid black" }}
+      {loggedUserMail === classData.ownerMail && (
+        <Box
+          sx={{
+            width: "80%",
+            border: "1px solid black",
+            padding: "2%",
+            borderRadius: 10,
+            m: "auto",
+            mt: 1,
+          }}
+          boxShadow={6}
         >
-          <ListItemAvatar>
-            <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-          </ListItemAvatar>
-          <ListItemText
-            primary="Brunch this weekend?"
-            secondary={
-              <React.Fragment>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                >
-                  Ali Connors
-                </Typography>
-                {" — I'll be in your neighborhood doing errands this…"}
-              </React.Fragment>
-            }
+          <TextField
+            id="filled-multiline-static"
+            label="Title"
+            fullWidth
+            variant="filled"
+            onChange={(e) => {
+              setInputTitle(e.target.value);
+            }}
           />
-          <img
-            className={classes.listImg}
-            src="https://www.pngrepo.com/png/237114/512/dummy-crash.png"
-            alt="help"
+
+          <TextField
+            fullWidth
+            label="Link goes here"
+
+            onChange={(e) => {
+              setInputLink(e.target.value);
+            }}
           />
-        </ListItem>
-      </AccordionDetails>
-    </Accordion>
-  ))}
-      
-      
-    </div>
+
+          <div style={{ padding: "2%" }}>
+            <input
+              onChange={(e) => handleChangeFile(e)}
+              variant="outlined"
+              color="primary"
+              type="file"
+            />
+
+            <button
+              onClick={(e) => {
+                handleAddModule(e);
+              }}
+              style={{ margin: "0 1% 1% 8%", padding: "1%" }}
+            >
+              Add module
+            </button>
+
+            <div style={{ float: "right" }}>
+              <button
+                onClick={(e) => handleUpload()}
+                className={classes.postBtn}
+              >
+                POST
+              </button>
+            </div>
+            <FormControl
+              style={{ width: "20%", float: "right", margin: "0 2% 2% 2%" }}
+            >
+              <InputLabel id="demo-simple-select-label">MODULE</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={module}
+                label="Module"
+                onChange={(e) => handleChangeModule(e)}
+              >
+                {modules.map((data, index) => (
+                  <MenuItem key={index} value={data.moduleName}>
+                    {data.moduleName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
+        </Box>
+      )}
+
+      <AllModules modules={modules} classData={classData}/>
     </Container>
-    
   );
 }
