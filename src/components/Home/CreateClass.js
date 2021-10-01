@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogActions } from "@material-ui/core";
 import { FormControl, TextField, Button } from "@material-ui/core";
+import FormHelperText from '@mui/material/FormHelperText';
 import { useLocalContext } from "../Context/context";
 import useStyles from "../../assets/styles/globalStyles/styles";
 import { v4 as uuidv4 } from "uuid";
@@ -20,11 +21,29 @@ function CreateClass() {
   const [className, setClassName] = useState("");
   const [subject, setSuject] = useState("");
   const [domain, setDomain] = useState("");
+  const [mails, setmails] = useState("");
+  const [mailarray, setmailarray] = useState([]);
 
+  
+  const shownumber = (e) => {
+    setmails(e.target.value)
+    console.log(mails)
+    var lines = mails.split(/\n/);
+    var output = []
+    var n = 0
+    for (var i = 0; i < lines.length; i++) {
+      if (/\S/.test(lines[i])) {
+        output.push(lines[i]);
+      }
+    }
+    n = output.length
+    setmailarray(output)
+    document.getElementById("No_of_mails").innerHTML = n
+  }
   //firebase details
 
   const handleSubmit = async (e) => {
-    console.log(className, subject, domain, loggedUserMail);
+    console.log(className, subject, domain, mails,loggedUserMail );
     e.preventDefault();
     console.log("id is ", uuidv4());
     console.log("timestamp");
@@ -46,6 +65,23 @@ function CreateClass() {
           ownerAvatarURL:loggedUser.photoURL,
           enrolled: [],
         });
+      
+      var i
+      for (i=0;i<mailarray.length;i++){
+          var current_mail=mailarray[i]
+          const mail_list = await db
+          .collection("CreatedClasses")
+          .doc(loggedUserMail)
+          .collection("ClassC")
+          .doc(id)
+          .collection("Status")
+          .doc(current_mail)
+          .set({
+            Enrolled_Status: false,
+            Progress: 0,
+          });
+      }
+        
       setCreateClassDialog(false);
       console.log("class added", addClass);
     } catch (e) {
@@ -62,7 +98,7 @@ function CreateClass() {
     >
       <DialogContent>
         <form>
-          <h1 style={{ textAlign: "center" }}>CREATE CLASS </h1>
+          <h1 style={{ textAlign: "center" }}>Create Class </h1>
 
           <FormControl noValidate autoComplete="on" className={classes.forms}>
             <TextField
@@ -92,6 +128,18 @@ function CreateClass() {
               className={classes.createInputFields}
               onChange={(e) => setDomain(e.target.value)}
             />
+            <TextField
+              label="Students mails"
+              type="text"
+              multiline
+              maxRows={4}
+              variant="outlined"
+              color="primary"
+              className={classes.createInputFields}
+              onChange={(e) => shownumber(e)}
+              aria-describedby="component-helper-text"
+              />
+              <FormHelperText id="component-helper-text"><span id="No_of_mails"></span> students mails present</FormHelperText>
           </FormControl>
         </form>
       </DialogContent>
