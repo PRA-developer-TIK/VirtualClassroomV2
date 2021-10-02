@@ -23,6 +23,7 @@ function CreateClass() {
   const [domain, setDomain] = useState("");
   const [mails, setmails] = useState("");
   const [mailarray, setmailarray] = useState([]);
+  const [mailcount, setmailcount] = useState(0);
 
   
   const shownumber = (e) => {
@@ -38,7 +39,7 @@ function CreateClass() {
     }
     n = output.length
     setmailarray(output)
-    document.getElementById("No_of_mails").innerHTML = n
+    setmailcount(n)
   }
   //firebase details
 
@@ -77,6 +78,8 @@ function CreateClass() {
           .collection("Status")
           .doc(current_mail)
           .set({
+            email_id: current_mail,
+            name: "",
             Enrolled_Status: false,
             Progress: 0,
           });
@@ -91,10 +94,11 @@ function CreateClass() {
 
   return (
     <Dialog
-      onClose={() => setCreateClassDialog(false)}
+      onClose={() =>{ setCreateClassDialog(false);setmailcount(0) }}
       aria-labelledby="customized-dialog-title"
       open={createClassDialog}
       maxWidth="xs"
+      fullWidth
     >
       <DialogContent>
         <form>
@@ -139,7 +143,7 @@ function CreateClass() {
               onChange={(e) => shownumber(e)}
               aria-describedby="component-helper-text"
               />
-              <FormHelperText id="component-helper-text"><span id="No_of_mails"></span> students mails present</FormHelperText>
+              <FormHelperText id="component-helper-text">{mailcount} students mails present</FormHelperText>
           </FormControl>
         </form>
       </DialogContent>
