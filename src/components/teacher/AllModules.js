@@ -11,17 +11,22 @@ import Avatar from "@mui/material/Avatar";
 import { Box, TextField, Container } from "@material-ui/core";
 import useStyles from "../../assets/styles/globalStyles/styles";
 import { useLocalContext } from "../Context/context";
+import ImgModal from "./ImageModal";
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ImageIcon from '@mui/icons-material/Image';
 
 export default function AllModules({ classData,modules }) {
   const classes = useStyles();
   console.log(classData)
 
-  console.log("modules are", modules);
+  // console.log("modules are", modules);
 
-  const { loggedUserMail, db } = useLocalContext();
+  const { loggedUserMail, db,openImg, setOpenImg } = useLocalContext();
 
   //open closing accordion
   const [open, setOpen] = React.useState(false);
+  const [url,setUrl]=useState("");
   const handleOpen = () => setOpen(true);
 
   return (
@@ -55,6 +60,7 @@ export default function AllModules({ classData,modules }) {
               {
                 data.content.map((subMod,index)=>(
                   <ListItem
+                  onClick={()=>console.log(index)}
                   key={index}
                 alignItems="flex-start"
                 style={{ border: "1px solid black" }}
@@ -71,19 +77,33 @@ export default function AllModules({ classData,modules }) {
                     </React.Fragment>
                   }
                 />
+
+                <div style={{display:"flex",cursor:"pointer",width:"15%"}}> 
+                <InsertDriveFileIcon sx={{m:1}} onClick={e=>window.location.href=`${subMod.docURL}`}/>
+        
+                <PictureAsPdfIcon sx={{m:1}} onClick={e=>window.location.href=`${subMod.pdfURL}`}/>
+                <ImageIcon sx={{m:1}} onClick={(e)=>{setOpenImg(true);setUrl(subMod.imgURL);console.log(url)}}/>
+                </div>
+
+
+                {/* <img
+                key={index}
                 
-                <img
-                  className={classes.listImg}
-                  onClick={(e)=>{console.log("hekko")}}
-                  src={subMod.fileURL}
+                className={classes.listImg}
+                  style={{cursor:"pointer"}}
+                  src={subMod.imgURL}
                   alt="help"
                 />
+                 */}
+                 {openImg && <ImgModal  url={url}/>}
+               
                
               </ListItem>
                 ))
               }
             </AccordionDetails>
           </Accordion>
+          
         </div>
       ))}
     </>

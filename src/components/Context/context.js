@@ -12,6 +12,7 @@ export const ContextProvider=({children})=>{
     const [joinClassDialog,setJoinClassDialog]=useState(false);
     const [loggedUser,setLoggedUser]=useState(null);
     const [loggedUserMail,setLoggedUserMail]=useState(null);
+    const [openImg, setOpenImg]=useState(false);
 
 
     const login=()=> auth.signInWithPopup(provider);
@@ -47,7 +48,8 @@ export const ContextProvider=({children})=>{
         joinClassDialog,
         setJoinClassDialog,
         login,logOut,
-        loggedUser,loggedUserMail,db,auth,storage
+        loggedUser,loggedUserMail,db,auth,storage,
+        openImg,setOpenImg
       };
     return (
         <AddContext.Provider value={value}>

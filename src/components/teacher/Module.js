@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, TextField, Container } from "@material-ui/core";
 import useStyles from "../../assets/styles/globalStyles/styles";
 import { useLocalContext } from "../Context/context";
@@ -9,6 +9,7 @@ import Select from "@mui/material/Select";
 import AllModules from "./AllModules";
 import firebase from "@firebase/app-compat";
 
+
 export default function Module({ modules, classData }) {
   const classes = useStyles();
 
@@ -16,89 +17,95 @@ export default function Module({ modules, classData }) {
 
   const [inputTitle, setInputTitle] = useState("");
   const [inputLink, setInputLink] = useState("");
-  console.log(inputTitle,inputLink)
 
   //module select
   const [module, setModule] = React.useState("");
 
   const handleChangeModule = (event) => {
     setModule(event.target.value);
-    console.log(event.target.value);
+    console.log("MODULE IS ",module)
   };
 
-  const [file, setFile] = useState(null);
-  const [fileType, setFileType] = useState(null);
+  const [files, setFiles] = useState([]);
 
   const handleChangeFile = (e) => {
-    setFileType(e.target.files[0].name.split(".").slice(-1)[0]);
-    setFile(e.target.files[0]);
+    const filesArr = [];
+    Object.keys(e.target.files).forEach((key) => {
+      // console.log(e.target.files[key].name.split(".").slice(-1)[0]);
+      filesArr.push(e.target.files[key]);
+    });
+    console.log(filesArr);
+
+    // filesArr.forEach(file=>console.log(file.name));
+    setFiles(filesArr);
   };
 
   const handleUpload = async (e) => {
-    if (file) {
-      const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
-      let url;
-      uploadFile.on("state_changed", async (snapshot) => {
-        url = await storage
-          .ref(`${fileType}s`)
-          .child(file.name)
-          .getDownloadURL();
-        console.log("code is", classData.code);
-        console.log(url);
+    const valid = ["pdf", "docx", "png", "jpeg", "jpg"];
 
-        let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("progress",progress)
-        if (progress === 100) {
-          try {
-            await db
-              .collection("CreatedClasses")
-              .doc(
-                loggedUserMail !== classData.ownerMail
-                  ? classData.ownerMail
-                  : loggedUserMail
-              )
-              .collection("ClassC")
-              .doc(classData.code)
-              .collection("modules")
-              .doc(module)
-              .update({
-                content: firebase.firestore.FieldValue.arrayUnion({
-                  fileURL: url,
-                  title: inputTitle,
-                  link: inputLink,
-                  avatarURL: classData.ownerAvatarURL,
-                }),
-              });
-          } catch (e) {
-            alert(e);
+    files.forEach(async (file) => {
+      let fileType = file.name.split(".").slice(-1)[0].toLowerCase();
+      console.log("filetype is ",fileType);
+
+      if (valid.includes(fileType)) {
+        const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
+
+        uploadFile.on("state_changed", async (snapshot) => {
+          let progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("progress", progress);
+          if (progress === 100) {
+            try {
+              await db
+                .collection("CreatedClasses")
+                .doc(
+                  loggedUserMail !== classData.ownerMail
+                    ? classData.ownerMail
+                    : loggedUserMail
+                )
+                .collection("ClassC")
+                .doc(classData.code)
+                .collection("modules")
+                .doc(module)
+                .update({
+                  content: firebase.firestore.FieldValue.arrayUnion({
+                    title: inputTitle,
+                    pdfURL:
+                      fileType === "pdf"
+                        ? await storage
+                            .ref(`${fileType}s`)
+                            .child(file.name)
+                            .getDownloadURL()
+                        : "",
+                    docURL:
+                      fileType === "docx"
+                        ? await storage
+                            .ref(`${fileType}s`)
+                            .child(file.name)
+                            .getDownloadURL()
+                        : "",
+                    imgURL:
+                      fileType === "png" ||
+                      fileType ==="jpeg" ||
+                      fileType ==="jpg"
+                        ? await storage
+                            .ref(`${fileType}s`)
+                            .child(file.name)
+                            .getDownloadURL()
+                        : "",
+                    link: inputLink,
+                    avatarURL: classData.ownerAvatarURL,
+                  }),
+                });
+            } catch (e) {
+              alert(e);
+            }
           }
-        }
-      });
-    } else {
-      try {
-        await db
-          .collection("CreatedClasses")
-          .doc(
-            loggedUserMail !== classData.ownerMail
-              ? classData.ownerMail
-              : loggedUserMail
-          )
-          .collection("ClassC")
-          .doc(classData.code)
-          .collection("modules")
-          .doc(module)
-          .update({
-            content: firebase.firestore.FieldValue.arrayUnion({
-              fileUrl: null,
-              title: inputTitle,
-              link: inputLink,
-              avatarURL: classData.ownerAvatarURL,
-            }),
-          });
-      } catch (e) {
-        alert(e);
+        });
+      } else {
+        alert("file invalid", file.name);
       }
-    }
+    });
   };
 
   //adding module to database
@@ -146,7 +153,6 @@ export default function Module({ modules, classData }) {
           <TextField
             fullWidth
             label="Link goes here"
-
             onChange={(e) => {
               setInputLink(e.target.value);
             }}
@@ -158,6 +164,7 @@ export default function Module({ modules, classData }) {
               variant="outlined"
               color="primary"
               type="file"
+              multiple
             />
 
             <button
@@ -180,7 +187,7 @@ export default function Module({ modules, classData }) {
             <FormControl
               style={{ width: "20%", float: "right", margin: "0 2% 2% 2%" }}
             >
-              <InputLabel id="demo-simple-select-label">MODULE</InputLabel>
+              <InputLabel id="demo-simple-select-label">ADD TO</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
@@ -199,7 +206,7 @@ export default function Module({ modules, classData }) {
         </Box>
       )}
 
-      <AllModules modules={modules} classData={classData}/>
+      <AllModules modules={modules} classData={classData} />
     </Container>
   );
 }

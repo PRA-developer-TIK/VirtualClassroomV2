@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -10,8 +10,13 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { Box,Modal,TextField} from "@material-ui/core";
 import useStyles from "../../assets/styles/globalStyles/styles";
-export default function AllFAQ() {
+import ImageIcon from '@mui/icons-material/Image';
+import ImgModal from "../teacher/ImageModal";
+import { useLocalContext } from "../Context/context";
+export default function AllFAQ({questions}) {
   const classes = useStyles();
+  const { loggedUserMail, db,openImg, setOpenImg } = useLocalContext();
+  const [url,setUrl]=useState();
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -29,30 +34,11 @@ export default function AllFAQ() {
     p: 4,
   };
 
-  const QModal=()=>{
-      return(
-    <Modal
-    open={open}
-    onClose={handleClose}
-    aria-labelledby="modal-modal-title"
-    aria-describedby="modal-modal-description"
-  >
-    <Box sx={style}>
-    <TextField
-          id="filled-multiline-static"
-          label="Multiline"
-          fullWidth
-          multiline
-          rows={4}
-          variant="filled"
-          defaultValue="Default Value"
-        />
-    <button onClick={()=>handleOpen()} style={{ padding: "1%",float:"right" }}>Post</button>
-    </Box>
-  </Modal>)
-  }
-  return (
-    <div
+  return(
+    <>
+    {questions.map((question,index)=>(
+      <div
+      key={index}
       style={{
         width: "80%",
         margin: "auto",
@@ -65,51 +51,38 @@ export default function AllFAQ() {
       <Accordion
         sx={{
           mt: 1,
+          width:"100%"
         }}
       >
         <AccordionSummary
-          expandIcon={<ExpandMoreIcon onClick={()=>handleOpen()}/>}
+          expandIcon={question.imgURL!==""? <ImageIcon sx={{m:1}} onClick={(e)=>{setOpenImg(true);setUrl(question.imgURL);console.log(url)}}/>:<ExpandMoreIcon onClick={handleOpen}/>}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography sx={{ width: '33%', flexShrink: 0 }}>Accordion 1 </Typography>
+          <Typography   >{question.question}  </Typography>
+          
         </AccordionSummary>
         <AccordionDetails>
-          <ListItem
+          {question.answers.map((ans,idx)=>(
+            <ListItem
             alignItems="flex-start"
             style={{ border: "1px solid black" }}
           >
             <ListItemAvatar>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              <Avatar alt="avtUrl" src={ans.avatarURL} />
             </ListItemAvatar>
             <ListItemText
-              primary="Brunch this weekend?"
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    sx={{ display: "inline" }}
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                  >
-                    Ali Connors
-                  </Typography>
-                  {" — I'll be in your neighborhood doing errands this…"}
-                </React.Fragment>
-              }
-            />
-            <img
-              className={classes.listImg}
-              src="https://www.pngrepo.com/png/237114/512/dummy-crash.png"
-              alt="help"
+            sx={{mt:2}}
+              primary={ans.answer}
+              
             />
           </ListItem>
+          ))}
         </AccordionDetails>
       </Accordion>
-      <QModal/>
-      
-      
+      {openImg && <ImgModal  url={url}/>}
     </div>
-    
-  );
+    ))}
+    </>
+  )
 }

@@ -53,7 +53,7 @@ function App() {
     }
   }, [loggedUserMail]);
 
-  console.log(createdClasses, joinedClasses);
+  // console.log(createdClasses, joinedClasses);
 
   return (
     <ThemeProvider theme={theme}>
@@ -76,7 +76,7 @@ function App() {
             <Route path="/" exact>
             {loggedUser?
               <AllClasses  createdClasses={createdClasses} joinedClasses={joinedClasses}/>
-              :null}
+              :<Login/>}
 
             </Route>
             <Route path="/login" exact>

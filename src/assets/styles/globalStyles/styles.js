@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "20%",
     display: "inline-block",
   },
-  listImg:{width:"5%",margin:"auto"}
+  listImg:{width:"5%",margin:"auto"},
 }));
 
 export default useStyles;
