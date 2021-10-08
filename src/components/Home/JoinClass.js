@@ -39,6 +39,7 @@ export default function JoinClass() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState(false);
+  const [errortxt, setErrortxt] = useState("");
 
   const [joinedData, setJoinedData] = useState({});
 
@@ -53,42 +54,74 @@ export default function JoinClass() {
         .collection("ClassC")
         .doc(code);
 
+      const toJoinClassmail = db
+        .collection("CreatedClasses")
+        .doc(email)
+        .collection("ClassC")
+        .doc(code)
+        .collection("Status")
+        .doc(loggedUser.email);
+
       let toJoinClass = await toJoinClassRef.get();
+      let lernermail = await toJoinClassmail.get();
+      
+      if ((toJoinClass.exists) && (toJoinClass.owner !== loggedUser.email)) {
+        if (lernermail.exists) {
+            console.log("classFound ", toJoinClass.data());
+            let data = toJoinClass.data();
+    
+            //updating the enrolled array in createdClasses to keep a track of enrolled students
+            toJoinClassRef.update({
+              enrolled: firebase.firestore.FieldValue.arrayUnion(loggedUserMail),
+            });
+    
+            console.log(data);
+            setJoinedData(data);
+            setError(false);
+            await db
+              .collection("joinedClasses")
+              .doc(loggedUserMail)
+              .collection("classesJ")
+              .doc(code)
+              .set(
+                {
+                  code: data.code,
+                  dateCreated: data.dateCreated,
+                  ownerMail: data.ownerMail,
+                  ownerAvatarURL:data.ownerAvatarURL,
+                  className: data.className,
+                  subject: data.subject,
+                  domain: data.domain,
+                },
+                { merge: true }
+              );
+            await db
+              .collection("CreatedClasses")
+              .doc(email)
+              .collection("ClassC")
+              .doc(code)
+              .collection("Status")
+              .doc(loggedUser.email)
+              .set(
+                {
+                  Enrolled_Status : true,
+                  name: loggedUser.displayName, },
+                { merge: true }
+              );
+            setJoinClassDialog(false);
+          } else {
+            setError(true);
+            setErrortxt("You dont have access to the class");
+            return;
+          }
 
-      if (toJoinClass.exists && toJoinClass.owner !== loggedUser.email) {
-        console.log("classFound ", toJoinClass.data());
-        let data = toJoinClass.data();
-
-        //updating the enrolled array in createdClasses to keep a track of enrolled students
-        toJoinClassRef.update({
-          enrolled: firebase.firestore.FieldValue.arrayUnion(loggedUserMail),
-        });
-
-        console.log(data);
-        setJoinedData(data);
-        setError(false);
-        await db
-          .collection("joinedClasses")
-          .doc(loggedUserMail)
-          .collection("classesJ")
-          .doc(code)
-          .set(
-            {
-              code: data.code,
-              dateCreated: data.dateCreated,
-              ownerMail: data.ownerMail,
-              ownerAvatarURL:data.ownerAvatarURL,
-              className: data.className,
-              subject: data.subject,
-              domain: data.domain,
-            },
-            { merge: true }
-          );
-        setJoinClassDialog(false);
-      } else {
+      }
+      else {
         setError(true);
+        setErrortxt("No class found");
         return;
       }
+      
     } catch (e) {
       console.log(e);
     }
@@ -148,7 +181,7 @@ export default function JoinClass() {
                   color="primary"
                   error={error}
                   onChange={(e) => setCode(e.target.value)}
-                  helperText={error && "No class found"}
+                  helperText={error && errortxt}
                   style={{ width: "50%", margin: "1%" }}
                   required={true}
                 />
