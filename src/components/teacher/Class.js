@@ -8,6 +8,7 @@ import Module from "./Module";
 import Announcement from "../Announcement/Announcement";
 import FAQ from "../FAQs/FAQ";
 import { useLocalContext } from "../Context/context";
+import People from "../People/People";
 function Class({ classData }) {
   const classes = useStyles();
   const { loggedUserMail, db } = useLocalContext();
@@ -63,7 +64,7 @@ function Class({ classData }) {
           <Tab value="announce" label="Announcements" />
           <Tab value="grades" label="Grades" />
           <Tab value="FAQs" label="FAQs" />
-          <Tab value="People" label="ppl" />
+          <Tab value="people" label="ppl" />
         </Tabs>
       </Box>
       <Container>
@@ -74,7 +75,9 @@ function Class({ classData }) {
         ) : value === "grades" ? (
           "grades"
         ) : value === "FAQs" ? (
-          <FAQ questions={questions} classData={classData}/>
+          <FAQ questions={questions} classData={classData} />
+        ) : value === "people" ? (
+          <People />
         ) : null}
       </Container>
     </>
