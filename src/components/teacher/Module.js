@@ -8,10 +8,9 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import AllModules from "./AllModules";
 import firebase from "@firebase/app-compat";
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import ImageIcon from '@mui/icons-material/Image';
-
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import ImageIcon from "@mui/icons-material/Image";
 
 export default function Module({ modules, classData }) {
   const classes = useStyles();
@@ -23,90 +22,94 @@ export default function Module({ modules, classData }) {
 
   //module select
   const [module, setModule] = React.useState("");
+  console.log("MODULE IS ", module);
 
   const handleChangeModule = (event) => {
     setModule(event.target.value);
-    console.log("MODULE IS ",module)
   };
 
-  const [files, setFiles] = useState([]);
+  //setting selected files
+  const [file, setFile] = useState(null);
 
-  const handleChangeFile = (e) => {
-    const filesArr = [];
-    Object.keys(e.target.files).forEach((key) => {
-      // console.log(e.target.files[key].name.split(".").slice(-1)[0]);
-      filesArr.push(e.target.files[key]);
-    });
-    console.log(filesArr);
-
-    // filesArr.forEach(file=>console.log(file.name));
-    setFiles(filesArr);
+  const handleChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
   const handleUpload = async (e) => {
-    const valid = ["pdf", "docx", "png", "jpeg", "jpg"];
+    let imgTypes = ["png", "jpeg", "jpg"];
+    let docTypes = [
+      "doc",
+      "docx",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    let fileType = file.name.split(".").slice(-1)[0].toLowerCase();
+    console.log("filetype is ", fileType);
+    const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
+    const dbRef = db
+      .collection("CreatedClasses")
+      .doc(loggedUserMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("modules")
+      .doc(module)
+      .collection("subMod")
+      .doc(inputTitle);
 
-    files.forEach(async (file) => {
-      let fileType = file.name.split(".").slice(-1)[0].toLowerCase();
-      console.log("filetype is ",fileType);
+    uploadFile.on("state_changed", async (snapshot) => {
+      let url = await storage
+        .ref(`${fileType}s`)
+        .child(file.name)
+        .getDownloadURL();
+      let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log("progress", progress);
 
-      if (valid.includes(fileType)) {
-        const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
+      let obj = {};
+      obj.URL = url;
+      obj.name = file.name;
+      obj.timestamp = firebase.firestore.Timestamp.now();
 
-        uploadFile.on("state_changed", async (snapshot) => {
-          let progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("progress", progress);
-          if (progress === 100) {
-            try {
-              await db
-                .collection("CreatedClasses")
-                .doc(
-                  loggedUserMail !== classData.ownerMail
-                    ? classData.ownerMail
-                    : loggedUserMail
-                )
-                .collection("ClassC")
-                .doc(classData.code)
-                .collection("modules")
-                .doc(module)
-                .update({
-                  content: firebase.firestore.FieldValue.arrayUnion({
-                    title: inputTitle,
-                    pdfURL:
-                      fileType === "pdf"
-                        ? await storage
-                            .ref(`${fileType}s`)
-                            .child(file.name)
-                            .getDownloadURL()
-                        : "",
-                    docURL:
-                      fileType === "docx"
-                        ? await storage
-                            .ref(`${fileType}s`)
-                            .child(file.name)
-                            .getDownloadURL()
-                        : "",
-                    imgURL:
-                      fileType === "png" ||
-                      fileType ==="jpeg" ||
-                      fileType ==="jpg"
-                        ? await storage
-                            .ref(`${fileType}s`)
-                            .child(file.name)
-                            .getDownloadURL()
-                        : "",
-                    link: inputLink,
-                    avatarURL: classData.ownerAvatarURL,
-                  }),
-                });
-            } catch (e) {
-              alert(e);
-            }
+      if (progress === 100) {
+        try {
+          if (fileType === "pdf") {
+            await dbRef.set(
+              {
+                modId: inputTitle,
+                pdfURL: firebase.firestore.FieldValue.arrayUnion(obj),
+              },
+              { merge: true }
+            );
+          } else if (imgTypes.includes(fileType)) {
+            await dbRef.set(
+              {
+                modId: inputTitle,
+                imgURL: firebase.firestore.FieldValue.arrayUnion(obj),
+              },
+              { merge: true }
+            );
+          } else if (docTypes.includes(fileType)) {
+            await dbRef.set(
+              {
+                modId: inputTitle,
+                docURL: firebase.firestore.FieldValue.arrayUnion(obj),
+              },
+              { merge: true }
+            );
           }
-        });
-      } else {
-        alert("file invalid", file.name);
+
+          if (inputLink !== "") {
+            await dbRef.set(
+              {
+                linkURL: firebase.firestore.FieldValue.arrayUnion({
+                  URL: inputLink,
+                }),
+              },
+              { merge: true }
+            );
+          }
+        } catch (e) {
+          alert(e);
+        }
       }
     });
   };
@@ -116,6 +119,7 @@ export default function Module({ modules, classData }) {
     e.preventDefault();
 
     let modCt = modules.length;
+    console.log("modCt", modCt);
     await db
       .collection("CreatedClasses")
       .doc(loggedUserMail)
@@ -124,8 +128,8 @@ export default function Module({ modules, classData }) {
       .collection("modules")
       .doc(`module${++modCt}`)
       .set({
-        moduleName: `module${modCt}`,
-        content: [],
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        modName: `module${modCt}`,
       });
   };
 
@@ -162,13 +166,35 @@ export default function Module({ modules, classData }) {
           />
 
           <div style={{ padding: "2%" }}>
-            <input
-              onChange={(e) => handleChangeFile(e)}
-              variant="outlined"
-              color="primary"
-              type="file"
-              multiple
-            />
+            <label>
+              <ImageIcon />
+              <input
+                onChange={(e) => handleChange(e)}
+                type="file"
+                accept=".png,.jpg,.jpeg"
+                style={{ display: "none" }}
+              />
+            </label>
+
+            <label>
+              <InsertDriveFileIcon />
+              <input
+                onChange={(e) => handleChange(e)}
+                type="file"
+                accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                style={{ display: "none" }}
+              />
+            </label>
+
+            <label>
+              <PictureAsPdfIcon />
+              <input
+                onChange={(e) => handleChange(e)}
+                type="file"
+                accept=".pdf"
+                style={{ display: "none" }}
+              />
+            </label>
 
             <button
               onClick={(e) => {
@@ -199,8 +225,8 @@ export default function Module({ modules, classData }) {
                 onChange={(e) => handleChangeModule(e)}
               >
                 {modules.map((data, index) => (
-                  <MenuItem key={index} value={data.moduleName}>
-                    {data.moduleName}
+                  <MenuItem key={index} value={data.modName}>
+                    {data.modName}
                   </MenuItem>
                 ))}
               </Select>

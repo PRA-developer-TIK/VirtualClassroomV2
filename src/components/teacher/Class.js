@@ -15,8 +15,8 @@ function Class({ classData }) {
   const [value, setValue] = React.useState("module");
   const [modules, setModules] = React.useState([]);
   const [questions, setQuestions] = React.useState([]);
-  console.log(value);
 
+  //getting modules
   useEffect(() => {
     if (classData) {
       console.log("classData", classData);
@@ -35,7 +35,9 @@ function Class({ classData }) {
         });
       return () => unsubscribe();
     }
-  }, [classData]);
+  }, [classData,loggedUserMail]);
+
+
 
   //getting all FAQs
   useEffect(() => {
@@ -50,7 +52,7 @@ function Class({ classData }) {
         });
       return () => unsubscribe();
     }
-  }, [classData]);
+  }, [classData,loggedUserMail]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);

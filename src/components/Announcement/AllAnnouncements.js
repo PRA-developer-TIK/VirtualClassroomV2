@@ -17,7 +17,7 @@ const Announcment = ({ classData }) => {
       return () => unsubscribe();
     }
   }, [classData]);
-  console.log(announcments);
+  // console.log(announcments);
   return (
     <>
       {announcments.map((item, index) => (

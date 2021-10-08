@@ -23,11 +23,16 @@ function Announcement({ classData }) {
     const uploadImage = storage.ref(`${fileType}s/${file.name}`).put(file);
     let url;
     const id = uuidv4();
-    uploadImage.on("state_changed", async () => {
+    uploadImage.on("state_changed", async (snapshot) => {
       url = await storage.ref(`${fileType}s`).child(file.name).getDownloadURL();
       console.log("code is", classData.code);
       console.log(url);
 
+      let progress =
+      (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    console.log("progress", progress);
+
+    if(progress===100){
       try {
         await db
           .collection("announcements")
@@ -44,6 +49,9 @@ function Announcement({ classData }) {
       } catch (e) {
         alert(e);
       }
+    }
+
+      
     });
   };
   const classes = useStyles();
