@@ -1,6 +1,6 @@
 import React from "react";
 import db,{ auth } from "../../firebase/config";
-import ClassCard from "../Classes/ClassCard";
+import ClassCard from "../Cards/ClassCard";
 import { Grid, Container } from "@material-ui/core";
 import Paper from "@mui/material/Paper";
 

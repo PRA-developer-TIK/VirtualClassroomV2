@@ -7,16 +7,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import useStyles from "../../assets/styles/globalStyles/styles";
 import { useLocalContext } from "../Context/context";
 import ImgModal from "./ImageModal";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import ImageIcon from "@mui/icons-material/Image";
-import LinkIcon from "@mui/icons-material/Link";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
+import SubModTable from "./SubModTable";
 
 
 export default function AllModules({ classData, modules }) {
@@ -80,7 +71,7 @@ export default function AllModules({ classData, modules }) {
   };
 
   // console.log("subModules are", subModules);
-  console.log("submodules are ",subModules);
+  // console.log("submodules are ",subModules);
   return (
     <>
       {modules.map((data, index) => (
@@ -116,8 +107,9 @@ export default function AllModules({ classData, modules }) {
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {subModules.map((data,idx)=>(
-                <div style={{display:"block"}} key={idx}> 
+              {/* {subModules.map((data,idx)=>(
+                {/* <div style={{display:"block"}} key={idx}> 
+                
                 <ImageIcon
                 onClick={(e) => {
                   getImgUrls(e, data.modName);
@@ -126,9 +118,13 @@ export default function AllModules({ classData, modules }) {
               <InsertDriveFileIcon />
               <PictureAsPdfIcon />
               <LinkIcon />
-                </div>
+                </div> 
 
-              ))}
+
+
+
+              ))} */}
+              <SubModTable subMod={subModules}/>
             </AccordionDetails>
           </Accordion>
         </div>
