@@ -1,39 +1,50 @@
-import React from "react"
-import { Box,Modal} from "@material-ui/core";
-import { useLocalContext } from "../Context/context";
-const ImgModal=({url})=>{
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import {useLocalContext} from "../Context/context"
 
+export default function ImgModal({url}) {
+  const [open, setOpen] = React.useState(false);
+  const  {setOpenImg,openImg}=useLocalContext();
 
-  const {openImg,setOpenImg}=useLocalContext();
- 
+  const handleClickOpen = () => {
+    setOpenImg(true);
+  };
 
-  
-    
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        p: 4,
-      };
-    return(
-  <Modal
-  open={openImg}
-  onClose={()=>setOpenImg(false)}
-  
-  aria-labelledby="modal-modal-title"
-  aria-describedby="modal-modal-description"
->
-  <Box sx={style}>
-  <img src={url} style={{width:"100%"}} alt="img"/>
+  const handleClose = () => {
+    setOpenImg(false);
+  };
 
-  </Box>
-</Modal>)
-
+  return (
+    <React.Fragment>
+      <Dialog style={{width:"100%"}} open={openImg} onClose={handleClose}>
+       
+        <DialogContent>
+          
+          <Box
+            noValidate
+            component="form"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              m: "auto"
+            }}
+          >
+            <img
+              src={url}
+              alt="img"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </React.Fragment>
+  );
 }
-
-export default ImgModal;

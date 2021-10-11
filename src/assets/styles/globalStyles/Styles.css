@@ -74,7 +74,10 @@
     border: 0.0625rem solid #dadce0;
     -webkit-border-radius: 0.5rem;
     border-radius: 0.5rem;
-    overflow: hidden;
+    max-height: 20%;
+  
+
+
     margin-bottom: 1.5rem;
   }
   .amt__top {

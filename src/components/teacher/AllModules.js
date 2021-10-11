@@ -40,9 +40,13 @@ export default function AllModules({ classData, modules }) {
 
   //getting submodules
   const getSubModules = async (modName) => {
+    
+    
     let submodules = await db
     .collection("CreatedClasses")
-    .doc(loggedUserMail)
+    .doc(loggedUserMail !== classData.ownerMail
+      ? classData.ownerMail
+      : loggedUserMail)
     .collection("ClassC")
     .doc(classData.code)
     .collection("modules")
@@ -53,22 +57,7 @@ export default function AllModules({ classData, modules }) {
     });
   };
 
-  //2 params modulename and
-  //getting imgUrls
-  const getImgUrls = async (e, modName) => {
-    e.preventDefault();
-    let imgUrls=await db
-      .collection("CreatedClasses")
-      .doc(loggedUserMail)
-      .collection("ClassC")
-      .doc(classData.code)
-      .collection("modules")
-      .doc(modName)
-      .collection("subMod")
-      .onSnapshot((snap) => {
-        (snap.docs.map((doc) => console.log(doc.data().imgURL)));
-      });
-  };
+  
 
   // console.log("subModules are", subModules);
   // console.log("submodules are ",subModules);
@@ -107,23 +96,7 @@ export default function AllModules({ classData, modules }) {
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {/* {subModules.map((data,idx)=>(
-                {/* <div style={{display:"block"}} key={idx}> 
-                
-                <ImageIcon
-                onClick={(e) => {
-                  getImgUrls(e, data.modName);
-                }}
-              />
-              <InsertDriveFileIcon />
-              <PictureAsPdfIcon />
-              <LinkIcon />
-                </div> 
 
-
-
-
-              ))} */}
               <SubModTable subMod={subModules}/>
             </AccordionDetails>
           </Accordion>

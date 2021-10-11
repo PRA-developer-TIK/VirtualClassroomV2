@@ -22,7 +22,7 @@ const Announcment = ({ classData }) => {
     <>
       {announcments.map((item, index) => (
         <Box
-        key={index}
+          key={index}
           sx={{
             width: "80%",
             border: "1px solid black",
@@ -30,6 +30,7 @@ const Announcment = ({ classData }) => {
             borderRadius: 10,
             m: "auto",
             mt: 1,
+            
           }}
           boxShadow={6}
         >
@@ -40,8 +41,35 @@ const Announcment = ({ classData }) => {
                 <div>{item.sender}</div>
               </div>
               <p className="amt__txt">{item.text}</p>
-              <img className="amt__img" src={item.imageUrl} alt={item.text}/>
-              <a href={item.imageUrl}>Link</a>
+              {
+                item.imgURL?.map((obj, idx) => (
+                  <embed key={idx} src={obj.URL} style={{width:"100%"}} >
+                  
+                  </embed>
+                  
+
+                ))
+              }
+              {
+                item.docURL?.map((obj, idx) => (
+                  <embed key={idx} src={obj.URL} style={{width:"40%"}}>
+                  
+                  </embed>
+                  
+
+                ))
+              }
+              {
+                item.pdfURL?.map((obj, idx) => (
+                  <embed key={idx} src={obj.URL} width="50" height="50">
+                  
+                  </embed>
+                  
+
+                ))
+              }
+
+
             </div>
           </div>
         </Box>

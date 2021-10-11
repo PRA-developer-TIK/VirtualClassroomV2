@@ -1,9 +1,10 @@
 import React from 'react'
 
- const People = () => {
+const People = () => {
+    
     return (
         <div>
-            All People
+
         </div>
     )
 }

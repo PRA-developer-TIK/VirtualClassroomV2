@@ -19,28 +19,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import LinkIcon from "@mui/icons-material/Link";
 import { CompressOutlined } from '@mui/icons-material';
 
-function createData(name, calories, fat, carbs, protein, price) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    price,
-    history: [
-      {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
-      },
-    ],
-  };
-}
+
 
 function Row({module}) {
   
@@ -61,10 +40,10 @@ function Row({module}) {
         <TableCell component="th" scope="row">
           {module.modId}
         </TableCell>
-        <TableCell align="right">{module.pdfURL?.length}</TableCell>
-        <TableCell align="right">{module.docURL?.length}</TableCell>
-        <TableCell align="right">{module.imgURL?.length}</TableCell>
-        <TableCell align="right">{module.linkURL?.length}</TableCell>
+        <TableCell align="center">{module.pdfURL?.length || 0}</TableCell>
+        <TableCell align="center">{module.docURL?.length || 0}</TableCell>
+        <TableCell align="center">{module.imgURL?.length || 0 }</TableCell>
+        <TableCell align="center">{module.linkURL?.length || 0}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -76,10 +55,10 @@ function Row({module}) {
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                    <TableCell >Date</TableCell>
+                    <TableCell align="center">Time</TableCell>
+                    <TableCell align="center">Name</TableCell>
+                    <TableCell align="center">Link</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -100,8 +79,8 @@ function Row({module}) {
                       {data.timestamp.toDate().toISOString().substr(0,10)}
                       </TableCell>
                       <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
-                      <TableCell>{data.name}</TableCell>
-                      <TableCell align="right"><PictureAsPdfIcon/></TableCell>
+                      <TableCell>{data.name.slice(0,10)}...</TableCell>
+                      <TableCell align="right"><InsertDriveFileIcon/></TableCell>
                       
                     </TableRow>
                   ))}
@@ -112,22 +91,23 @@ function Row({module}) {
                       {data.timestamp.toDate().toISOString().substr(0,10)}
                       </TableCell>
                       <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
-                      <TableCell>{data.name}</TableCell>
-                      <TableCell align="right"><PictureAsPdfIcon/></TableCell>
+                      <TableCell>{data.name.slice(0,10)}...</TableCell>
+                      <TableCell align="right"><ImageIcon /></TableCell>
                       
                     </TableRow>
                   ))}
-                  {module.linkURL?.map((data) => (
-                    <TableRow key={data.timestamp}>
-                      {/* <TableCell component="th" scope="row">
-                      {data.timestamp.toDate().toISOString().substr(0,10)}
-                      </TableCell>
-                      <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell> */}
-                      <TableCell >{data.URL}</TableCell>
-                      <TableCell align="right"><PictureAsPdfIcon/></TableCell>
-                      
-                    </TableRow>
+                  
+                  <div>
+                  <h4>Links</h4>
+                  {module.linkURL?.map((data,index) => (
+                    <div key={index} style={{display:"flex"}}>
+                      <Typography sx={{flexGrow:0}} >{data.URL.substr(0,7)==="http://"?data.URL:`http://${data.URL}`}</Typography>
+                      <Typography sx={{alignItems:"flex-end"}}   ><a href={data.URL.substr(0,7)==="http://"?data.URL:`http://${data.URL}`} target="_blank"  rel="noreferrer" ><LinkIcon/></a></Typography>
+                    </div>
                   ))}
+                  </div>
+
+                  
                 </TableBody>
               </Table>
             </Box>
@@ -138,31 +118,6 @@ function Row({module}) {
   );
 }
 
-Row.propTypes = {
-  row: PropTypes.shape({
-    calories: PropTypes.number.isRequired,
-    carbs: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    protein: PropTypes.number.isRequired,
-  }).isRequired,
-};
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-  createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-];
 
 export default function CollapsibleTable({subMod}) {
     console.log("in table subMods",subMod);
@@ -172,16 +127,16 @@ export default function CollapsibleTable({subMod}) {
         <TableHead>
           <TableRow>
             <TableCell />
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            <TableCell>SubModule</TableCell>
+            <TableCell align="center">Pdfs</TableCell>
+            <TableCell align="center">Docs</TableCell>
+            <TableCell align="center">Images</TableCell>
+            <TableCell align="center">Urls</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {subMod.map((subModule) => (
-            <Row key={subModule.modId} module={subModule} />
+          {subMod.map((subModule,index) => (
+            <Row key={index} module={subModule} />
           ))}
         </TableBody>
       </Table>

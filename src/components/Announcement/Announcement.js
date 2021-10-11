@@ -6,59 +6,151 @@ import { useLocalContext } from "../Context/context";
 import firebase from "@firebase/app-compat";
 import { v4 as uuidv4 } from "uuid";
 import AllAnnouncements from "./AllAnnouncements";
-
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 function Announcement({ classData }) {
   const { storage, db, loggedUserMail, loggedUser } = useLocalContext();
 
   const [inputValue, setInputValue] = useState("");
-  const [file, setFile] = useState(null);
-  const [fileType, setFileType] = useState(null);
+  const [inputLinks, setInputLinks] = useState([]);
+  const [files, setFiles] = useState([]);
   const handleChange = (e) => {
-    // To get type of file pdf,doc,img etc.
-    // console.log("file is ",e.target.files[0].name.split('.').slice(-1)[0])
-    setFileType(e.target.files[0].name.split(".").slice(-1)[0]);
-    setFile(e.target.files[0]);
+   
+    setFiles(Object.keys(e.target.files).map(key=>(e.target.files[key])));
   };
   const handleUpload = async (e) => {
-    const uploadImage = storage.ref(`${fileType}s/${file.name}`).put(file);
-    let url;
-    const id = uuidv4();
-    uploadImage.on("state_changed", async (snapshot) => {
-      url = await storage.ref(`${fileType}s`).child(file.name).getDownloadURL();
-      console.log("code is", classData.code);
-      console.log(url);
+    
+    let id = uuidv4();
+    let dbRef = db
+      .collection("announcements")
+      .doc(classData.code)
+      .collection("allAnnouncements")
+      .doc(id);
 
-      let progress =
-      (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-    console.log("progress", progress);
+    if (files.length > 0 && inputValue) {
+      files.forEach(async (file) => {
+        let imgTypes = ["png", "jpeg", "jpg"];
+        let docTypes = [
+          "doc",
+          "docx",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ];
+        let fileType = files[0].name.split(".").slice(-1)[0].toLowerCase();
+        const uploadImage = storage.ref(`${fileType}s/${file.name}`).put(file);
+        let url;
+        uploadImage.on("state_changed", async (snapshot) => {
+          url = await storage.ref(`${fileType}s`).child(file.name).getDownloadURL();
+          console.log("code is", classData.code);
+          console.log(url);
 
-    if(progress===100){
+          let progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("progress", progress);
+
+          let obj = {};
+          obj.URL = url;
+          obj.name = file.name;
+
+
+          if (progress === 100) {
+            try {
+              if (fileType === "pdf") {
+                await dbRef.set(
+                  {
+                    id: id,
+                    timestamp : firebase.firestore.Timestamp.now(),
+                    text: inputValue,
+                    sender: loggedUserMail,
+                    ownerAvatarURL: loggedUser.photoURL,
+                    pdfURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                  },
+                  { merge: true }
+                );
+              } else if (imgTypes.includes(fileType)) {
+                await dbRef.set(
+                  {
+                    id: id,
+                    timestamp : firebase.firestore.Timestamp.now(),
+                    text: inputValue,
+                    sender: loggedUserMail,
+                    ownerAvatarURL: loggedUser.photoURL,
+                    text: inputValue,
+                    imgURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                  },
+                  { merge: true }
+                );
+              } else if (docTypes.includes(fileType)) {
+                await dbRef.set(
+                  {
+                    id: id,
+                    timestamp : firebase.firestore.Timestamp.now(),
+                    text: inputValue,
+                    sender: loggedUserMail,
+                    ownerAvatarURL: loggedUser.photoURL,
+                    text: inputValue,
+                    docURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                  },
+                  { merge: true }
+                );
+              }
+
+              if (inputLinks !== []) {
+                await dbRef.set(
+                  {
+                    linkURL: inputLinks
+                  },
+                  { merge: true }
+                );
+              }
+            } catch (e) {
+              alert(e);
+            }
+          }
+
+
+        });
+
+      })
+      
+
+    } else if (inputValue) {
       try {
-        await db
-          .collection("announcements")
-          .doc(classData.code)
-          .collection("allAnnouncements")
-          .doc(id)
-          .set({
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            imageUrl: url,
+        if (inputLinks !== []) {
+          await dbRef.set(
+            {
+              linkURL: inputLinks,
+            },
+            { merge: true }
+          );
+        }
+
+        await dbRef.set(
+          {
+            id: id,
+            timestamp : firebase.firestore.Timestamp.now(),
             text: inputValue,
             sender: loggedUserMail,
             ownerAvatarURL: loggedUser.photoURL,
-          });
+            text: inputValue,
+            pdfURL:[],
+            docURL:[],
+            imgURL:[],
+          },
+          { merge: true }
+        );
       } catch (e) {
-        alert(e);
+
       }
+    } else {
+      alert("input value needed")
     }
 
-      
-    });
   };
   const classes = useStyles();
 
   return (
     <Container>
-      <Box
+      {loggedUserMail === classData.ownerMail && (<Box
         sx={{
           width: "80%",
           border: "1px solid black",
@@ -71,23 +163,35 @@ function Announcement({ classData }) {
       >
         <TextField
           id="filled-multiline-static"
-          label="Multiline"
-          fullWidth
+          label="Content"
           multiline
-          rows={4}
+          rows={2}
+          fullWidth
           variant="filled"
-          defaultValue="Default Value"
           onChange={(e) => {
             setInputValue(e.target.value);
           }}
         />
+
+        <TextField
+          fullWidth
+          label="Links go here"
+          onChange={(e) => {
+            setInputLinks(e.target.value.split(" "));
+          }}
+        />
+
         <div style={{ padding: "2%" }}>
-          <input
-            onChange={(e) => handleChange(e)}
-            variant="outlined"
-            color="primary"
-            type="file"
-          />
+          <label>
+            <FileUploadIcon />
+            <input
+              onChange={(e) => handleChange(e)}
+              multiple
+              type="file"
+              accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              style={{ display: "none" }}
+            />
+          </label>
 
           <div style={{ float: "right" }}>
             <button
@@ -101,7 +205,8 @@ function Announcement({ classData }) {
             </button>
           </div>
         </div>
-      </Box>
+      </Box>)
+      }
       <AllAnnouncements classData={classData} />
     </Container>
   );
