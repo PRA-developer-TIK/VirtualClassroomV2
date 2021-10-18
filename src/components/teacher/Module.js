@@ -127,6 +127,20 @@ export default function Module({ modules, classData }) {
         moduleName: `module${modCt}`,
         content: [],
       });
+    
+    await db.collection("CreatedClasses")
+      .doc(loggedUserMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Status").get().then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+            var temp_prog = doc.data().Progress;
+            temp_prog.push(0);
+            doc.ref.update({
+                Progress: temp_prog
+            });
+        });
+    });
   };
 
   return (

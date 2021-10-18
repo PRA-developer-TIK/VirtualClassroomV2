@@ -81,7 +81,7 @@ function CreateClass() {
             email_id: current_mail,
             name: "",
             Enrolled_Status: false,
-            Progress: 0,
+            Progress: [],
           });
       }
         
