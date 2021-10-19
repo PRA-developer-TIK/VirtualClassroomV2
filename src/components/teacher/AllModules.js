@@ -97,7 +97,7 @@ export default function AllModules({ classData, modules }) {
             </AccordionSummary>
             <AccordionDetails>
 
-              <SubModTable subMod={subModules}/>
+              <SubModTable subMod={subModules} classData={classData}/>
             </AccordionDetails>
           </Accordion>
         </div>

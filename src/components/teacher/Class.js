@@ -11,7 +11,7 @@ import { useLocalContext } from "../Context/context";
 import People from "../People/People";
 function Class({ classData }) {
   const classes = useStyles();
-  const { loggedUserMail, db } = useLocalContext();
+  const { loggedUserMail, db,deleteDialog } = useLocalContext();
   const [value, setValue] = React.useState("module");
   const [modules, setModules] = React.useState([]);
   const [questions, setQuestions] = React.useState([]);

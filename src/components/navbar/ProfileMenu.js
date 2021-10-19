@@ -12,7 +12,7 @@ import { useLocalContext } from '../Context/context';
 
 export default function AccountMenu() {
   //importing global states
-  const {db,auth,loggedUser}=useLocalContext();
+  const {db,auth,loggedUser,loggedUserMail}=useLocalContext();
 
   const history=useHistory();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -30,7 +30,7 @@ export default function AccountMenu() {
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
           <IconButton onClick={handleClick} size="small" sx={{ ml: 2 }}>
-            <Avatar sx={{ width: 32, height: 32 }} src={loggedUser.photoURL}>M</Avatar>
+            <Avatar sx={{ width: 32, height: 32 }} src={loggedUser.photoURL}></Avatar>
           </IconButton>
       </Box>
       <Menu

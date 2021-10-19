@@ -13,7 +13,10 @@ import useStyles from "../../assets/styles/globalStyles/styles";
 import ImageIcon from '@mui/icons-material/Image';
 import ImgModal from "../teacher/ImageModal";
 import { useLocalContext } from "../Context/context";
-export default function AllFAQ({questions}) {
+import DeleteIcon from '@mui/icons-material/Delete';
+import firebase from "@firebase/app-compat";
+
+export default function AllFAQ({questions,classData}) {
   const classes = useStyles();
   const { loggedUserMail, db,openImg, setOpenImg } = useLocalContext();
   const [url,setUrl]=useState();
@@ -33,6 +36,17 @@ export default function AllFAQ({questions}) {
     boxShadow: 24,
     p: 4,
   };
+
+  const handleDelFaq=async(ques,ans)=>{
+   let faq=await db
+        .collection("FAQs")
+        .doc(classData.code)
+        .collection("allFAQs")
+        .doc(ques.name)
+        .update({
+          answers:firebase.firestore.FieldValue.arrayRemove(ans)
+        })
+  }
 
   return(
     <>
@@ -65,6 +79,7 @@ export default function AllFAQ({questions}) {
         <AccordionDetails>
           {question.answers.map((ans,idx)=>(
             <ListItem
+            key={idx}
             alignItems="flex-start"
             style={{ border: "1px solid black" }}
           >
@@ -76,6 +91,7 @@ export default function AllFAQ({questions}) {
               primary={ans.answer}
               
             />
+            <DeleteIcon onClick={()=>handleDelFaq(question,ans)} style={{cursor:"pointer"}}/>
           </ListItem>
           ))}
         </AccordionDetails>

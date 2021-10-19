@@ -219,7 +219,7 @@ function FAQ({ questions, classData }) {
         )}
       </Box>
 
-      <AllFAQ questions={questions} />
+      <AllFAQ questions={questions} classData={classData} />
     </Container>
   );
 }
