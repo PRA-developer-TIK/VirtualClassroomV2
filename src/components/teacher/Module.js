@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, TextField, Container } from "@material-ui/core";
+import { Box, TextField, Container,Button } from "@material-ui/core";
 import useStyles from "../../assets/styles/globalStyles/styles";
 import { useLocalContext } from "../Context/context";
 import InputLabel from "@mui/material/InputLabel";
@@ -20,9 +20,12 @@ export default function Module({ modules, classData }) {
   const [inputTitle, setInputTitle] = useState("");
   const [inputLink, setInputLink] = useState("");
 
+  //deleting subMod
+
+
   //module select
   const [module, setModule] = React.useState("");
-  console.log("MODULE IS ", module);
+  // console.log("MODULE IS ", module);
 
   const handleChangeModule = (event) => {
     setModule(event.target.value);
@@ -216,7 +219,7 @@ export default function Module({ modules, classData }) {
             <FormControl
               style={{ width: "20%", float: "right", margin: "0 2% 2% 2%" }}
             >
-              <InputLabel id="demo-simple-select-label">ADD TO</InputLabel>
+              <InputLabel  id="demo-simple-select-label">ADD TO</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"

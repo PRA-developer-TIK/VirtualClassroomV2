@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -17,129 +17,215 @@ import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ImageIcon from "@mui/icons-material/Image";
 import LinkIcon from "@mui/icons-material/Link";
-import { CompressOutlined } from '@mui/icons-material';
+import DeleteDialog from './DeleteDialog';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useLocalContext } from "../Context/context";
+import firebase from '@firebase/app-compat';
 
+function Row({module,classData}){
+  const [open,setOpen]=useState(false)
+  const {db}=useLocalContext();
 
+  const handleDelFile=async(type,data,id)=>{
+    let fileRef=await db
+    .collection("CreatedClasses")
+    .doc(classData.ownerMail)
+    .collection("ClassC")
+    .doc(classData.code)
+    .collection("modules")
+    .doc(`module${id[0]}`)
+    .collection("subMod")
+    .doc(id)
 
-function Row({module}) {
+    if(type=="pdf"){
+      fileRef.update({
+        pdfURL:firebase.firestore.FieldValue.arrayRemove(data)
   
-  const [open, setOpen] = React.useState(false);
+      })
+    }else if(type=="img"){
+      fileRef.update({
+        imgURL:firebase.firestore.FieldValue.arrayRemove(data)
+  
+      })
+
+    }else if(type=="doc"){
+      fileRef.update({
+        docURL:firebase.firestore.FieldValue.arrayRemove(data)
+  
+      })
+
+    }else if(type=="link"){
+      fileRef.update({
+        linkURL:firebase.firestore.FieldValue.arrayRemove(data)
+  
+      })
+    }
+    
+    
+
+  }
+
 
   return (
     <React.Fragment>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell component="th" scope="row">
-          {module.modId}
-        </TableCell>
-        <TableCell align="center">{module.pdfURL?.length || 0}</TableCell>
-        <TableCell align="center">{module.docURL?.length || 0}</TableCell>
-        <TableCell align="center">{module.imgURL?.length || 0 }</TableCell>
-        <TableCell align="center">{module.linkURL?.length || 0}</TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell >Date</TableCell>
-                    <TableCell align="center">Time</TableCell>
-                    <TableCell align="center">Name</TableCell>
-                    <TableCell align="center">Link</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {module.pdfURL?.map((data) => (
-                    <TableRow key={data.timestamp}>
-                      <TableCell component="th" scope="row">
-                      {data.timestamp.toDate().toISOString().substr(0,10)}
-                      </TableCell>
-                      <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
-                      <TableCell>{data.name}</TableCell>
-                      <TableCell align="right"><PictureAsPdfIcon/></TableCell>
-                      
-                    </TableRow>
-                  ))}
-                  {module.docURL?.map((data) => (
-                    <TableRow key={data.timestamp}>
-                      <TableCell component="th" scope="row">
-                      {data.timestamp.toDate().toISOString().substr(0,10)}
-                      </TableCell>
-                      <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
-                      <TableCell>{data.name.slice(0,10)}...</TableCell>
-                      <TableCell align="right"><InsertDriveFileIcon/></TableCell>
-                      
-                    </TableRow>
-                  ))}
-                  {module.imgURL?.map((data) => (
-                    <TableRow key={data.timestamp}>
-                    {/* {console.log("tpe is ",data.timestamp.toDate().toISOString().substr(11,12))} */}
-                      <TableCell component="th" scope="row">
-                      {data.timestamp.toDate().toISOString().substr(0,10)}
-                      </TableCell>
-                      <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
-                      <TableCell>{data.name.slice(0,10)}...</TableCell>
-                      <TableCell align="right"><ImageIcon /></TableCell>
-                      
-                    </TableRow>
-                  ))}
-                  
-                  <div>
-                  <h4>Links</h4>
-                  {module.linkURL?.map((data,index) => (
-                    <div key={index} style={{display:"flex"}}>
-                      <Typography sx={{flexGrow:0}} >{data.URL.substr(0,7)==="http://"?data.URL:`http://${data.URL}`}</Typography>
-                      <Typography sx={{alignItems:"flex-end"}}   ><a href={data.URL.substr(0,7)==="http://"?data.URL:`http://${data.URL}`} target="_blank"  rel="noreferrer" ><LinkIcon/></a></Typography>
-                    </div>
-                  ))}
-                  </div>
+              <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                <TableCell>
+                  <IconButton
+                    aria-label="expand row"
+                    size="small"
+                    onClick={() => setOpen(!open)}
+                  >
+                    {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                  </IconButton>
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {module.modId}
+                </TableCell>
+                <TableCell align="center">{module.pdfURL?.length || 0}</TableCell>
+                <TableCell align="center">{module.docURL?.length || 0}</TableCell>
+                <TableCell align="center">{module.imgURL?.length || 0}</TableCell>
+                <TableCell align="center">{module.linkURL?.length || 0}</TableCell>
 
-                  
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
+              </TableRow>
+              <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                  <Collapse in={open} timeout="auto" unmountOnExit>
+                    <Box sx={{ margin: 1 }}>
+                      <Typography variant="h6" gutterBottom component="div">
+                        Details
+                      </Typography>
+                      <Table size="small" aria-label="purchases">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell >Date</TableCell>
+                            <TableCell align="center">Time</TableCell>
+                            <TableCell align="center">Name</TableCell>
+                            <TableCell align="center">Link</TableCell>
+                            <TableCell align="center">Del</TableCell>
+
+
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+
+
+                          {module.pdfURL?.map((data) => (
+                            <TableRow key={data.name}>
+                              <TableCell component="th" scope="row">
+                                {data.timestamp.toDate().toISOString().substr(0, 10)}
+                              </TableCell>
+                              <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
+                              <TableCell>{data.name}</TableCell>
+                              <TableCell align="center"><PictureAsPdfIcon /></TableCell>
+                              <TableCell align="center">< DeleteIcon onClick={() => {
+                                // setDeleteDialog(true);
+                        
+                                handleDelFile("pdf",data,module.modId);
+                              }}
+                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+
+
+                            </TableRow>
+                          ))}
+                          {module.docURL?.map((data) => (
+                            <TableRow key={data. name}>
+                              <TableCell component="th" scope="row">
+                                {data.timestamp.toDate().toISOString().substr(0, 10)}
+                              </TableCell>
+                              <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
+                              <TableCell>{data.name.slice(0, 10)}...</TableCell>
+                              <TableCell align="center"><InsertDriveFileIcon /></TableCell>
+                              <TableCell align="center">< DeleteIcon onClick={() => {
+                                // setDeleteDialog(true);
+                        
+                                handleDelFile("doc",data,module.modId);
+                              }}
+                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+                            </TableRow>
+                          ))}
+                          {module.imgURL?.map((data) => (
+                            <TableRow key={data.name}>
+                              {/* {console.log("tpe is ",data.timestamp.toDate().toISOString().substr(11,12))} */}
+                              <TableCell component="th" scope="row">
+                                {data.timestamp.toDate().toISOString().substr(0, 10)}
+                              </TableCell>
+                              <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
+                              <TableCell>{data.name.slice(0, 10)}...</TableCell>
+                              <TableCell align="center"><ImageIcon /></TableCell>
+                              <TableCell align="center">< DeleteIcon onClick={() => {
+                                // setDeleteDialog(true);
+                        
+                                handleDelFile("img",data,module.modId);
+                              }}
+                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+
+                            </TableRow>
+                          ))}
+
+                          {module.linkURL?.map((data, index) => (
+                            <TableRow key={data.name}>
+                              {/* {console.log("tpe is ",data.timestamp.toDate().toISOString().substr(11,12))} */}
+                              <TableCell component="th" scope="row">
+                                --
+                              </TableCell>
+                              <TableCell>--</TableCell>
+                              <TableCell>{data.URL.substr(0, 7) === "http://" ? data.URL : `http://${data.URL}`}</TableCell>
+                              <TableCell align="center"><a href={data.URL.substr(0, 7) === "http://" ? data.URL : `http://${data.URL}`} target="_blank" rel="noreferrer" ><LinkIcon /></a></TableCell>
+                              <TableCell align="center">< DeleteIcon onClick={() => {
+                                // setDeleteDialog(true);
+                        
+                                handleDelFile("link",data,module.modId);
+                              }}
+                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+                            </TableRow>
+                          ))}
+
+
+
+
+                        </TableBody>
+                      </Table>
+                    </Box>
+                  </Collapse>
+                </TableCell>
+              </TableRow>
+
+            </React.Fragment>
+  )
 }
 
 
-export default function CollapsibleTable({subMod}) {
-    console.log("in table subMods",subMod);
+
+
+
+
+export default function CollapsibleTable({ subMod,classData }) {
+
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow>
-            <TableCell />
-            <TableCell>SubModule</TableCell>
-            <TableCell align="center">Pdfs</TableCell>
-            <TableCell align="center">Docs</TableCell>
-            <TableCell align="center">Images</TableCell>
-            <TableCell align="center">Urls</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {subMod.map((subModule,index) => (
-            <Row key={index} module={subModule} />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <>
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell>SubModule</TableCell>
+              <TableCell align="center">Pdfs</TableCell>
+              <TableCell align="center">Docs</TableCell>
+              <TableCell align="center">Images</TableCell>
+              <TableCell align="center">Urls</TableCell>
+
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {subMod.map((subModule, index) => (
+              <Row key={index} module={subModule} classData={classData}   />
+              // setDeleteDialog={setDeleteDialog}
+              
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {/* <DeleteDialog open={deleteDialog} data={delFileData} type={delFileType} /> */}
+    </>
   );
 }

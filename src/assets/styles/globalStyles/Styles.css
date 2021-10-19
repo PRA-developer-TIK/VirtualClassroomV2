@@ -75,6 +75,7 @@
     -webkit-border-radius: 0.5rem;
     border-radius: 0.5rem;
     max-height: 20%;
+    
   
 
 
@@ -83,6 +84,8 @@
   .amt__top {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    font-size: "1%";
   }
   .amt__top > * {
     margin-left: 10px;
