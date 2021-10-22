@@ -55,6 +55,23 @@ function Class({ classData }) {
     }
   }, [classData,loggedUserMail]);
 
+  //getting people data
+  useEffect(() => {
+    try {
+      let unsubscribe = db
+        .collection("CreatedClasses")
+        .doc(loggedUserMail)
+        .collection("ClassC")
+        .doc(classData.code)
+        .collection("Status").orderBy('Enrolled_Status','desc').onSnapshot((snap) => {
+          setRow(snap.docs.map((doc) => doc.data()));
+        });
+      
+    }catch (e) {
+      console.log("error is ",e);
+  }
+  }, [classData]);
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
