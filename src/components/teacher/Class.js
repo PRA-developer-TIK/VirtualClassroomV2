@@ -69,7 +69,7 @@ function Class({ classData }) {
         });
       
     }catch (e) {
-      console.log(e);
+      console.log("error is ",e);
   }
   }, [classData]);
 
