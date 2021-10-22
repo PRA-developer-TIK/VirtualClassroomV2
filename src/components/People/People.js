@@ -77,8 +77,8 @@ export default function People({ classData ,rows }) {
     
   }
   const searchstudent = async(e) =>{
-    if (validator.isEmail(searchmail)) {
-      if (searchmail != "" ) {
+    if (searchmail != "") {
+      if (validator.isEmail(searchmail)) {
         const student_doc = await db
         .collection("CreatedClasses")
         .doc(loggedUserMail)
@@ -97,13 +97,13 @@ export default function People({ classData ,rows }) {
         }
       }
       else {
-        settablerows(rows);
+        setError(true);
+        setErrortxt("Enter a Valid Email");
+        return;
       }
     }
     else {
-      setError(true);
-      setErrortxt("Enter a Valid Email");
-      return;
+      settablerows(rows);
     }
   }
 
