@@ -8,7 +8,9 @@ import useStyles from "../../assets/styles/globalStyles/styles";
 import { useLocalContext } from "../Context/context";
 import ImgModal from "./ImageModal";
 import SubModTable from "./SubModTable";
-
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 export default function AllModules({ classData, modules }) {
   const classes = useStyles();
@@ -91,9 +93,12 @@ export default function AllModules({ classData, modules }) {
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography sx={{ width: "100%", flexShrink: 0 }}>
+              <Typography sx={{ width: "33%" }}>
                 {data.modName}
+                
               </Typography>
+              <button style={{padding:"1px"}} ><AccessTimeIcon color="warning"   fontSize="medium"  /></button>
+              <button><DeleteIcon/></button>
             </AccordionSummary>
             <AccordionDetails>
 
