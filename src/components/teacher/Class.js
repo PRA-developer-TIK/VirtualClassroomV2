@@ -16,6 +16,7 @@ function Class({ classData }) {
   const [value, setValue] = React.useState("module");
   const [modules, setModules] = React.useState([]);
   const [questions, setQuestions] = React.useState([]);
+  const [rows,setRows]=useState([]);
 
   //getting modules
   useEffect(() => {
@@ -64,7 +65,7 @@ function Class({ classData }) {
         .collection("ClassC")
         .doc(classData.code)
         .collection("Status").orderBy('Enrolled_Status','desc').onSnapshot((snap) => {
-          setRow(snap.docs.map((doc) => doc.data()));
+          setRows(snap.docs.map((doc) => doc.data()));
         });
       
     }catch (e) {
@@ -97,7 +98,7 @@ function Class({ classData }) {
         ) : value === "FAQs" ? (
           <FAQ questions={questions} classData={classData} />
         ) : value === "people" ? (
-          <People />
+          <People classData={classData} rows={rows}/>
         ) : null}
       </Container>
     </>

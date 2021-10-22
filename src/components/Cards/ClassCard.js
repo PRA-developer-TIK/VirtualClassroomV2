@@ -3,7 +3,7 @@ import db,{ auth} from "../../firebase/config";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardActions from "@mui/material/CardActions";
-
+import DeleteIcon from '@mui/icons-material/Delete';
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
@@ -27,7 +27,7 @@ export default function ClassCard({classData}) {
         subheader={classData.dateCreated}
         action={
           <IconButton aria-label="settings">
-            <MoreVertIcon />
+            <DeleteIcon />
           </IconButton>
         }
         
