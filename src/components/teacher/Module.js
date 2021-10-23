@@ -65,6 +65,7 @@ function Module({ modules, classData,progress }) {
           obj.URL = url;
           obj.name = file.name;
           obj.timestamp=firebase.firestore.Timestamp.now();
+          
 
 
           if (progress === 100) {

@@ -86,6 +86,13 @@ export default function AllModules({ classData, modules,progress }) {
 
   }
 
+  //delete module
+  const handleDelMod=(e,modName)=>{
+    e.preventDefault();
+    console.log(modName);
+
+  }
+
   // console.log("subModules are", subModules);
   // console.log("submodules are ",subModules);
   return (
@@ -138,7 +145,7 @@ export default function AllModules({ classData, modules,progress }) {
               }
 
               {loggedUserMail === classData.ownerMail &&
-                (<button><DeleteIcon /></button>)
+                (<button onClick={(e)=>{handleDelMod(e,data.modName)}}><DeleteIcon /></button>)
               }
 
             </AccordionSummary>
