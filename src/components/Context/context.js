@@ -15,16 +15,10 @@ export const ContextProvider=({children})=>{
     const [openImg, setOpenImg]=useState(false);
     const [deleteDialog,setDeleteDialog]=useState(false);
     const [confDel,setConfDel]=useState(false);
-    
 
-    let login;
-    try{
 
-         login=()=> auth.signInWithPopup(provider);
-    }catch(e){
-        alert(e);
-    }
-    
+
+    const login=()=> auth.signInWithPopup(provider);
     const logOut=()=> auth.signOut();
 
 
