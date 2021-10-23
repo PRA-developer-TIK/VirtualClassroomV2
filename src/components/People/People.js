@@ -40,7 +40,7 @@ export default function People({ classData ,rows }) {
       try {
         const no_module_snap = await db
           .collection("CreatedClasses")
-          .doc(loggedUserMail)
+          .doc(classData.ownerMail)
           .collection("ClassC")
           .doc(classData.code)
           .collection("modules")
@@ -51,7 +51,7 @@ export default function People({ classData ,rows }) {
         var prog_array = []
         console.log(count)
         count == 0? prog_array = []: count == 1? prog_array=[0]:prog_array = Array(count).fill(0)
-        const addtoclass = await db
+        await db
           .collection("CreatedClasses")
           .doc(loggedUserMail)
           .collection("ClassC")

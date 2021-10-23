@@ -23,18 +23,20 @@ import { useLocalContext } from "../Context/context";
 import firebase from '@firebase/app-compat';
 
 function Row({module,classData}){
+  // console.log("module is ",module)
   const [open,setOpen]=useState(false)
-  const {db}=useLocalContext();
+  const {db,loggedUserMail}=useLocalContext();
 
   const handleDelFile=async(type,data,id)=>{
+    console.log(type,data,id);
     let fileRef=await db
     .collection("CreatedClasses")
     .doc(classData.ownerMail)
     .collection("ClassC")
     .doc(classData.code)
-    .collection("modules")
+    .collection("Modules")
     .doc(`module${id[0]}`)
-    .collection("subMod")
+    .collection("SubMod")
     .doc(id)
 
     if(type=="pdf"){
@@ -101,7 +103,8 @@ function Row({module,classData}){
                             <TableCell align="center">Time</TableCell>
                             <TableCell align="center">Name</TableCell>
                             <TableCell align="center">Link</TableCell>
-                            <TableCell align="center">Del</TableCell>
+                            {loggedUserMail === classData.ownerMail &&
+                            (<TableCell align="center">Del</TableCell>)}
 
 
                           </TableRow>
@@ -116,13 +119,16 @@ function Row({module,classData}){
                               </TableCell>
                               <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
                               <TableCell>{data.name}</TableCell>
-                              <TableCell align="center"><PictureAsPdfIcon /></TableCell>
-                              <TableCell align="center">< DeleteIcon onClick={() => {
-                                // setDeleteDialog(true);
-                        
-                                handleDelFile("pdf",data,module.modId);
-                              }}
-                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+                              <TableCell align="center"><a href={data.URL} target="_blank" rel="noreferrer"><PictureAsPdfIcon /></a></TableCell>
+                              {loggedUserMail === classData.ownerMail &&
+                                (<TableCell align="center">< DeleteIcon onClick={() => {
+                                  // setDeleteDialog(true);
+                          
+                                  handleDelFile("pdf",data,module.id);
+                                }}
+                                  style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)
+                              }
+                              
 
 
                             </TableRow>
@@ -134,13 +140,14 @@ function Row({module,classData}){
                               </TableCell>
                               <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
                               <TableCell>{data.name.slice(0, 10)}...</TableCell>
-                              <TableCell align="center"><InsertDriveFileIcon /></TableCell>
-                              <TableCell align="center">< DeleteIcon onClick={() => {
+                              <TableCell align="center"><a href={data.URL} target="_blank" rel="noreferrer"><InsertDriveFileIcon /></a></TableCell>
+                              {loggedUserMail === classData.ownerMail &&
+                              (<TableCell align="center">< DeleteIcon onClick={() => {
                                 // setDeleteDialog(true);
                         
-                                handleDelFile("doc",data,module.modId);
+                                handleDelFile("doc",data,module.id);
                               }}
-                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)}
                             </TableRow>
                           ))}
                           {module.imgURL?.map((data) => (
@@ -151,32 +158,35 @@ function Row({module,classData}){
                               </TableCell>
                               <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
                               <TableCell>{data.name.slice(0, 10)}...</TableCell>
-                              <TableCell align="center"><ImageIcon /></TableCell>
-                              <TableCell align="center">< DeleteIcon onClick={() => {
+                              <TableCell align="center"><a style={{color:"black"}} href={data.URL} target="_blank" rel="noreferrer"><ImageIcon /></a></TableCell>
+                              {loggedUserMail === classData.ownerMail &&
+                              (<TableCell align="center">< DeleteIcon onClick={() => {
                                 // setDeleteDialog(true);
                         
-                                handleDelFile("img",data,module.modId);
+                                handleDelFile("img",data,module.id);
                               }}
-                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)}
 
                             </TableRow>
                           ))}
 
-                          {module.linkURL?.map((data, index) => (
-                            <TableRow key={data.name}>
-                              {/* {console.log("tpe is ",data.timestamp.toDate().toISOString().substr(11,12))} */}
+                          {module.linkURL?.map((URL, index) => (
+                            
+                            <TableRow key={URL}>
+                              
                               <TableCell component="th" scope="row">
                                 --
                               </TableCell>
                               <TableCell>--</TableCell>
-                              <TableCell>{data.URL.substr(0, 7) === "http://" ? data.URL : `http://${data.URL}`}</TableCell>
-                              <TableCell align="center"><a href={data.URL.substr(0, 7) === "http://" ? data.URL : `http://${data.URL}`} target="_blank" rel="noreferrer" ><LinkIcon /></a></TableCell>
-                              <TableCell align="center">< DeleteIcon onClick={() => {
+                              <TableCell>{URL.substr(0, 7) === "http://" ?URL : `http://${URL}`}</TableCell>
+                              <TableCell align="center"><a href={URL.substr(0, 7) === "http://" ? URL : `http://${URL}`} target="_blank" rel="noreferrer" ><LinkIcon /></a></TableCell>
+                              {loggedUserMail === classData.ownerMail &&
+                              (<TableCell align="center">< DeleteIcon onClick={() => {
                                 // setDeleteDialog(true);
                         
-                                handleDelFile("link",data,module.modId);
+                                handleDelFile("link",URL,module.id);
                               }}
-                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
+                                style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)}
                             </TableRow>
                           ))}
 
@@ -200,6 +210,7 @@ function Row({module,classData}){
 
 
 export default function CollapsibleTable({ subMod,classData }) {
+  console.log("submofs is ",subMod);
 
   return (
     <>
@@ -218,6 +229,7 @@ export default function CollapsibleTable({ subMod,classData }) {
           </TableHead>
           <TableBody>
             {subMod.map((subModule, index) => (
+              
               <Row key={index} module={subModule} classData={classData}   />
               // setDeleteDialog={setDeleteDialog}
               

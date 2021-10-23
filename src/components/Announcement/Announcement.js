@@ -27,7 +27,8 @@ function Announcement({ classData }) {
       .doc(id);
 
     if (files.length > 0 && inputValue) {
-      files.forEach(async (file) => {
+      files.forEach(async (file,idx) => {
+        console.log(file.name,idx);
         let imgTypes = ["png", "jpeg", "jpg"];
         let docTypes = [
           "doc",
@@ -35,7 +36,8 @@ function Announcement({ classData }) {
           "application/msword",
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         ];
-        let fileType = files[0].name.split(".").slice(-1)[0].toLowerCase();
+        let fileType = files[idx].name.split(".").slice(-1)[0].toLowerCase();
+        
         const uploadImage = storage.ref(`${fileType}s/${file.name}`).put(file);
         let url;
         uploadImage.on("state_changed", async (snapshot) => {
@@ -53,6 +55,7 @@ function Announcement({ classData }) {
 
 
           if (progress === 100) {
+            console.log("filetyoe is ",fileType);
             try {
               if (fileType === "pdf") {
                 await dbRef.set(
@@ -150,7 +153,7 @@ function Announcement({ classData }) {
 
   return (
     <Container>
-      {loggedUserMail === classData.ownerMail && (<Box
+      { (<Box
         sx={{
           width: "80%",
           border: "1px solid black",

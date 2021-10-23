@@ -17,6 +17,7 @@ function Class({ classData }) {
   const [modules, setModules] = React.useState([]);
   const [questions, setQuestions] = React.useState([]);
   const [rows,setRows]=useState([]);
+  const [progress,setProgress]= useState([]);
 
   //getting modules
   useEffect(() => {
@@ -31,7 +32,7 @@ function Class({ classData }) {
         )
         .collection("ClassC")
         .doc(classData.code)
-        .collection("modules")
+        .collection("Modules")
         .onSnapshot((snap) => {
           setModules(snap.docs.map((doc) => doc.data()));
         });
@@ -61,7 +62,7 @@ function Class({ classData }) {
     try {
       let unsubscribe = db
         .collection("CreatedClasses")
-        .doc(loggedUserMail)
+        .doc(classData.ownerMail)
         .collection("ClassC")
         .doc(classData.code)
         .collection("Status").orderBy('Enrolled_Status','desc').onSnapshot((snap) => {
@@ -72,6 +73,36 @@ function Class({ classData }) {
       console.log("error is ",e);
   }
   }, [classData]);
+
+  //getting progress details
+  useEffect(async() => {
+    if(classData.ownerMail!==loggedUserMail){
+      try {
+        let prog =await db
+          .collection("CreatedClasses")
+          .doc(classData.ownerMail)
+          .collection("ClassC")
+          .doc(classData.code)
+          .collection("Status")
+          .doc(loggedUserMail)
+          .get();
+          
+
+          setProgress(prog.data().Progress)
+
+
+
+
+        
+      }catch (e) {
+        console.log("error is ",e);
+    }
+    }
+    
+  }, [classData]);
+
+  
+  
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -90,7 +121,7 @@ function Class({ classData }) {
       </Box>
       <Container>
         {value === "module" ? (
-          <Module modules={modules} classData={classData} />
+          <Module modules={modules} classData={classData} progress={progress} />
         ) : value === "announce" ? (
           <Announcement classData={classData} />
         ) : value === "grades" ? (

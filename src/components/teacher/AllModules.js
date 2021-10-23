@@ -11,14 +11,17 @@ import SubModTable from "./SubModTable";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { SettingsInputHdmiRounded } from "@material-ui/icons";
 
-export default function AllModules({ classData, modules }) {
+export default function AllModules({ classData, modules,progress }) {
   const classes = useStyles();
   console.log(classData);
 
   //setModules and subModules
   const [currModule, setCurrModule] = useState("");
   const [currSubModule, setCurrSubModule] = useState("");
+  const [complete, setComplete] = useState(false);
+  
 
 
   const { loggedUserMail, db, openImg, setOpenImg } = useLocalContext();
@@ -33,33 +36,55 @@ export default function AllModules({ classData, modules }) {
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
-    
+
   };
 
   const [subModules, setSubModules] = useState([]);
   // console.log("currModule ", currModule);
-  
+
 
   //getting submodules
   const getSubModules = async (modName) => {
-    
-    
+
+
     let submodules = await db
-    .collection("CreatedClasses")
-    .doc(loggedUserMail !== classData.ownerMail
-      ? classData.ownerMail
-      : loggedUserMail)
-    .collection("ClassC")
-    .doc(classData.code)
-    .collection("modules")
-    .doc(modName)
-    .collection("subMod")
-    .onSnapshot((snap) => {
-      setSubModules(snap.docs.map((doc) => doc.data()));
-    });
+      .collection("CreatedClasses")
+      .doc(classData.ownerMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Modules")
+      .doc(modName)
+      .collection("SubMod")
+      .onSnapshot((snap) => {
+        setSubModules(snap.docs.map((doc) => doc.data()));
+      });
   };
 
-  
+  //toggling complete incomplete module
+  const handleToggleMod =async (e,idx)=>{
+    e.preventDefault();
+    
+    console.log("mod idx is ",idx);
+
+      
+
+      progress[idx]=progress[idx]===0?1:0;
+      
+
+      await db
+      .collection("CreatedClasses")
+      .doc(classData.ownerMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Status")
+      .doc(loggedUserMail)
+      .set({
+        Progress:progress,
+      },{merge:true})
+    
+
+
+  }
 
   // console.log("subModules are", subModules);
   // console.log("submodules are ",subModules);
@@ -68,9 +93,9 @@ export default function AllModules({ classData, modules }) {
       {modules.map((data, index) => (
         <div
           onClick={() => {
-            
+
             getSubModules(data.modName);
-            
+
           }}
           key={index}
           style={{
@@ -95,14 +120,31 @@ export default function AllModules({ classData, modules }) {
             >
               <Typography sx={{ width: "33%" }}>
                 {data.modName}
-                
+
               </Typography>
-              <button style={{padding:"1px"}} ><AccessTimeIcon color="warning"   fontSize="medium"  /></button>
-              <button><DeleteIcon/></button>
+              {loggedUserMail !== classData.ownerMail &&
+                (<button style={{ padding: "1px", cursor: "pointer" }} onClick={(e)=>handleToggleMod(e,index)} >
+                  {
+
+                    progress[index] ?
+                      <CheckCircleIcon color="success" fontSize="medium" />
+                      :
+                      <AccessTimeIcon color="warning" fontSize="medium" />
+
+                  }
+
+
+                </button>)
+              }
+
+              {loggedUserMail === classData.ownerMail &&
+                (<button><DeleteIcon /></button>)
+              }
+
             </AccordionSummary>
             <AccordionDetails>
 
-              <SubModTable subMod={subModules} classData={classData}/>
+              <SubModTable subMod={subModules} classData={classData} />
             </AccordionDetails>
           </Accordion>
         </div>
