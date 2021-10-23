@@ -27,7 +27,6 @@ import {
 export default function People({ classData ,rows }) {
   const { db, loggedUserMail} = useLocalContext();
   const [email, setEmail] = useState("");
-  const [count, setcount] = useState(0);
   const [searchmail, setMail] = useState("");
   const [rowsintable, settablerows] = useState(rows);
   const [error, setError] = useState(false);
@@ -46,10 +45,8 @@ export default function People({ classData ,rows }) {
           .collection("modules")
           .get()
         
-        setcount(no_module_snap.size)
-        
         var prog_array = []
-        console.log(count)
+        let count = no_module_snap.size
         count == 0? prog_array = []: count == 1? prog_array=[0]:prog_array = Array(count).fill(0)
         const addtoclass = await db
           .collection("CreatedClasses")
