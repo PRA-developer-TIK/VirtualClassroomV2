@@ -81,7 +81,7 @@ function Row({module,classData}){
                   </IconButton>
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  {module.idd}
+                  {module.id}
                 </TableCell>
                 <TableCell align="center">{module.pdfURL?.length || 0}</TableCell>
                 <TableCell align="center">{module.docURL?.length || 0}</TableCell>

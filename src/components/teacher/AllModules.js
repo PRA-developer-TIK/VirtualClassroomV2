@@ -90,6 +90,8 @@ export default function AllModules({ classData, modules,progress }) {
   const handleDelMod=(e,modName)=>{
     e.preventDefault();
     console.log(modName);
+    
+
 
   }
 
