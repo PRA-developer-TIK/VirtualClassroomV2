@@ -4,6 +4,7 @@ import { FormControl, TextField, Button } from "@material-ui/core";
 import FormHelperText from '@mui/material/FormHelperText';
 import { useLocalContext } from "../Context/context";
 import useStyles from "../../assets/styles/globalStyles/styles";
+import firebase from "@firebase/app-compat";
 import { v4 as uuidv4 } from "uuid";
 
 function CreateClass() {
@@ -24,6 +25,7 @@ function CreateClass() {
   const [mails, setmails] = useState("");
   const [mailarray, setmailarray] = useState([]);
   const [mailcount, setmailcount] = useState(0);
+  const [noofmods, setmodcount] = useState(0);
 
   
   const shownumber = (e) => {
@@ -66,6 +68,20 @@ function CreateClass() {
           ownerAvatarURL:loggedUser.photoURL,
           enrolled: [],
         });
+
+        for (let j=1;j<=noofmods;j++){
+          await db
+          .collection("CreatedClasses")
+          .doc(loggedUserMail)
+          .collection("ClassC")
+          .doc(id)
+          .collection("Modules")
+          .doc(`module${j}`)
+          .set({
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            modName: `module${j}`,
+          });
+        }
       
       var i
       for (i=0;i<mailarray.length;i++){
@@ -131,6 +147,16 @@ function CreateClass() {
               name="Domain"
               className={classes.createInputFields}
               onChange={(e) => setDomain(e.target.value)}
+            />
+            <TextField
+              label="No Of Modules"
+              type="number"
+              variant="outlined"
+              color="primary"
+              className={classes.createInputFields}
+              required={true}
+              inputProps={{ min: 1, max: 10 }}
+              onChange={(e) => setmodcount(e.target.value)}
             />
             <TextField
               label="Students mails"
