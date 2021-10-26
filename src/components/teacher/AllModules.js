@@ -127,7 +127,7 @@ export default function AllModules({ classData, modules,progress }) {
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography sx={{ width: "33%" }}>
+              <Typography sx={{ width: "100%", flexShrink: 0 }}>
                 {data.modName}
 
               </Typography>

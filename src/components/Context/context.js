@@ -18,14 +18,9 @@ export const ContextProvider=({children})=>{
     const [modNo,setModNo]=useState(0);
     
 
-    let login;
-    try{
 
-         login=()=> auth.signInWithPopup(provider);
-    }catch(e){
-        alert(e);
-    }
-    
+
+    const login=()=> auth.signInWithPopup(provider);
     const logOut=()=> auth.signOut();
 
 

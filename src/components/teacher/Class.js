@@ -9,7 +9,6 @@ import Announcement from "../Announcement/Announcement";
 import FAQ from "../FAQs/FAQ";
 import { useLocalContext } from "../Context/context";
 import People from "../People/People";
-
 function Class({ classData }) {
   const classes = useStyles();
   const { loggedUserMail, db,deleteDialog } = useLocalContext();
@@ -66,11 +65,11 @@ function Class({ classData }) {
         .collection("ClassC")
         .doc(classData.code)
         .collection("Status").orderBy('Enrolled_Status','desc').onSnapshot((snap) => {
-          setRows(snap.docs.map((doc) => doc.data()));
+          setRow(snap.docs.map((doc) => doc.data()));
         });
       
     }catch (e) {
-      console.log("error is ",e);
+      console.log(e);
   }
   }, [classData]);
 
@@ -116,7 +115,7 @@ function Class({ classData }) {
           <Tab value="announce" label="Announcements" />
           <Tab value="grades" label="Grades" />
           <Tab value="FAQs" label="FAQs" />
-          <Tab value="people" label="ppl" />
+          <Tab value="people" label="People" />
         </Tabs>
       </Box>
       <Container>
