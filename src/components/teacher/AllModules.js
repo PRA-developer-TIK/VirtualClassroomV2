@@ -100,7 +100,23 @@ export default function AllModules({ classData, modules,progress }) {
   return (
     <>
       {modules.map((data, index) => (
-        <div
+        // <div
+        //   onClick={() => {
+
+        //     getSubModules(data.modName);
+
+        //   }}
+        //   key={index}
+        //   style={{
+            
+        //     width: "80%",
+        //     margin: "auto",
+        //     marginTop: "2%",
+        //     border: "1px solid red",
+        //     display: "block",
+        //   }}
+        // >
+          <Accordion
           onClick={() => {
 
             getSubModules(data.modName);
@@ -108,26 +124,27 @@ export default function AllModules({ classData, modules,progress }) {
           }}
           key={index}
           style={{
+            
             width: "80%",
             margin: "auto",
             marginTop: "2%",
-            border: "1px solid black",
+            border: "1px solid red",
             display: "block",
           }}
-        >
-          <Accordion
             expanded={expanded === `${data.modName}`}
             onChange={handleChange(data.modName)}
             sx={{
               mt: 1,
+              backgroundColor:"black",
+              color:"red"
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
+              expandIcon={<ExpandMoreIcon style={{color:"red"}} />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography sx={{ width: "100%", flexShrink: 0 }}>
+              <Typography sx={{ width: "50%", flexShrink: 0 }}>
                 {data.modName}
 
               </Typography>
@@ -135,7 +152,7 @@ export default function AllModules({ classData, modules,progress }) {
                 (<button style={{ padding: "1px", cursor: "pointer" }} onClick={(e)=>handleToggleMod(e,index)} >
                   {
 
-                    progress[index] ?
+                    progress && progress[index] ?
                       <CheckCircleIcon color="success" fontSize="medium" />
                       :
                       <AccessTimeIcon color="warning" fontSize="medium" />
@@ -146,17 +163,17 @@ export default function AllModules({ classData, modules,progress }) {
                 </button>)
               }
 
-              {loggedUserMail === classData.ownerMail &&
+              {/* {loggedUserMail === classData.ownerMail &&
                 (<button onClick={(e)=>{handleDelMod(e,data.modName)}}><DeleteIcon /></button>)
-              }
+              } */}
 
             </AccordionSummary>
             <AccordionDetails>
-
+              
               <SubModTable subMod={subModules} classData={classData} />
             </AccordionDetails>
           </Accordion>
-        </div>
+        // </div>
       ))}
     </>
   );

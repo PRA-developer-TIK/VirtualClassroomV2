@@ -215,6 +215,7 @@ export default function CollapsibleTable({ subMod,classData }) {
 
   return (
     <>
+    
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
           <TableHead>
@@ -230,9 +231,11 @@ export default function CollapsibleTable({ subMod,classData }) {
           </TableHead>
           <TableBody>
             {subMod.map((subModule, index) => (
-              
+              <>
+              <h4>Ciophers </h4>
               <Row key={index} module={subModule} classData={classData}   />
-              // setDeleteDialog={setDeleteDialog}
+              
+              </>
               
             ))}
           </TableBody>

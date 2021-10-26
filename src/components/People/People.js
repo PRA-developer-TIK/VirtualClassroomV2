@@ -161,8 +161,8 @@ export default function People({ classData ,rows }) {
               <TableCell component="th" scope="row">
                 {row.name=="" ? '---' : row.name}
               </TableCell>
-              <TableCell align="centre">{row.email_id}</TableCell>
-              <TableCell align="centre">{giveprogress(row.Enrolled_Status,row.Progress)}</TableCell>
+              <TableCell align="center">{row.email_id}</TableCell>
+              <TableCell align="center">{giveprogress(row.Enrolled_Status,row.Progress)}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -175,7 +175,7 @@ export default function People({ classData ,rows }) {
                       <TableHead>
                         <TableRow>
                           <TableCell><h3>Modules</h3></TableCell>
-                          <TableCell align="centre"><h3>Status</h3></TableCell>
+                          <TableCell align="center"><h3>Status</h3></TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -219,7 +219,7 @@ export default function People({ classData ,rows }) {
           >
           <div style={{ display: "flex", marginTop: "20px" }}>
           <TextField
-                  align="centre"
+                  align="center"
                   label="Add New Students Email"
                   type="email"
                   variant="outlined"
@@ -241,7 +241,7 @@ export default function People({ classData ,rows }) {
           </Box>
           <div style={{ display: "flex", marginTop: "20px" }}>
           <TextField
-                  align="centre"
+                  align="center"
                   label="Search by Students email"
                   type="email"
                   variant="outlined"
@@ -265,9 +265,9 @@ export default function People({ classData ,rows }) {
                     <TableHead>
                     <TableRow>
                         <TableCell />
-                        <TableCell align="centre"><h2>Name</h2></TableCell>
-                        <TableCell align="centre"><h2>Email</h2></TableCell>
-                        <TableCell align="centre"><h2>Progress</h2></TableCell>
+                        <TableCell align="center"><h2>Name</h2></TableCell>
+                        <TableCell align="center"><h2>Email</h2></TableCell>
+                        <TableCell align="center"><h2>Progress</h2></TableCell>
                     </TableRow>
                     </TableHead>
                     <TableBody>

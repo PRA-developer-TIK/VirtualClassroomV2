@@ -9,6 +9,7 @@ import Announcement from "../Announcement/Announcement";
 import FAQ from "../FAQs/FAQ";
 import { useLocalContext } from "../Context/context";
 import People from "../People/People";
+import Assignment  from "../Assignments/Assignment";
 function Class({ classData }) {
   const classes = useStyles();
   const { loggedUserMail, db,deleteDialog } = useLocalContext();
@@ -65,7 +66,7 @@ function Class({ classData }) {
         .collection("ClassC")
         .doc(classData.code)
         .collection("Status").orderBy('Enrolled_Status','desc').onSnapshot((snap) => {
-          setRow(snap.docs.map((doc) => doc.data()));
+          setRows(snap.docs.map((doc) => doc.data()));
         });
       
     }catch (e) {
@@ -113,7 +114,7 @@ function Class({ classData }) {
         <Tabs value={value} onChange={handleChange} centered>
           <Tab value="module" label="Modules" />
           <Tab value="announce" label="Announcements" />
-          <Tab value="grades" label="Grades" />
+          <Tab value="classwork" label="task" />
           <Tab value="FAQs" label="FAQs" />
           <Tab value="people" label="People" />
         </Tabs>
@@ -123,8 +124,8 @@ function Class({ classData }) {
           <Module modules={modules} classData={classData} progress={progress} />
         ) : value === "announce" ? (
           <Announcement classData={classData} />
-        ) : value === "grades" ? (
-          "grades"
+        ) : value === "classwork" ? (
+          <Assignment classData={classData} />
         ) : value === "FAQs" ? (
           <FAQ questions={questions} classData={classData} />
         ) : value === "people" ? (

@@ -83,7 +83,7 @@ function CreateClass() {
           });
         }
       
-      var i
+      let i
       for (i=0;i<mailarray.length;i++){
           var current_mail=mailarray[i]
           const mail_list = await db
