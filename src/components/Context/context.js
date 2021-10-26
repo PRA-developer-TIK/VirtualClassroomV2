@@ -14,7 +14,8 @@ export const ContextProvider=({children})=>{
     const [loggedUserMail,setLoggedUserMail]=useState(null);
     const [openImg, setOpenImg]=useState(false);
     const [deleteDialog,setDeleteDialog]=useState(false);
-    const [confDel,setConfDel]=useState(false);
+    const [openAddModModal,setOpenAddModModal]=useState(false);
+    const [modNo,setModNo]=useState(0);
     
 
     let login;
@@ -60,6 +61,8 @@ export const ContextProvider=({children})=>{
         loggedUser,loggedUserMail,db,auth,storage,
         openImg,setOpenImg,
         deleteDialog,setDeleteDialog,
+        openAddModModal,setOpenAddModModal,
+        modNo,setModNo
         
       };
     return (

@@ -11,12 +11,15 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import  ModInpModal from "./inputModuleModal";
+
+
 function Module({ modules, classData,progress }) {
-  const { storage, db, loggedUserMail, loggedUser } = useLocalContext();
+  const { storage, db, loggedUserMail, loggedUser,openAddModModal,setOpenAddModModal } = useLocalContext();
 
   const [inputTitle, setInputTitle] = useState("");
   const [inputLinks, setInputLinks] = useState([]);
-    const [module, setModule] = React.useState("");
+  const [module, setModule] = React.useState("");
   const [files, setFiles] = useState([]);
 
     const handleChangeModule = (event) => {
@@ -164,25 +167,43 @@ function Module({ modules, classData,progress }) {
 
   };
 
-    const handleAddModule = async (e) => {
+  const handleOpenModal=(e)=>{
     e.preventDefault();
+    setOpenAddModModal(true);
+    
+  }
 
-    let modCt = modules.length;
-    console.log("modCt", modCt);
+    const handleAddModule = async (modNo) => {
+    
+
+    // let modCt = modules.length;
+    console.log("mod no is ", modNo);
+
     await db
       .collection("CreatedClasses")
       .doc(classData.ownerMail)
       .collection("ClassC")
       .doc(classData.code)
       .collection("Modules")
-      .doc(`module${++modCt}`)
+    
+    
+
+  
+    await db
+      .collection("CreatedClasses")
+      .doc(classData.ownerMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Modules")
+      .doc(`module${modNo}`)
       .set({
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        modName: `module${modCt}`,
+        modName: `module${modNo}`,
+        modNo:modNo,
       });
     
     await db.collection("CreatedClasses")
-      .doc(loggedUserMail)
+      .doc(classData.ownerMail)
       .collection("ClassC")
       .doc(classData.code)
       .collection("Status").get().then(function(querySnapshot) {
@@ -194,6 +215,8 @@ function Module({ modules, classData,progress }) {
             });
         });
     });
+
+    setOpenAddModModal(false);
   };
 
   
@@ -248,7 +271,7 @@ function Module({ modules, classData,progress }) {
           
           <button
             onClick={(e) => {
-              handleAddModule(e);
+              handleOpenModal(e);
             }}
             style={{ margin: "0 1% 1% 8%", padding: "1%" }}
           >
@@ -286,7 +309,9 @@ function Module({ modules, classData,progress }) {
     )}
 
     <AllModules modules={modules} classData={classData} />
+    {openAddModModal && <ModInpModal addMod={handleAddModule}/>}
   </Container>
+
   );
 }
 
