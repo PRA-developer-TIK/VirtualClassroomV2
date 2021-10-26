@@ -83,9 +83,12 @@ function CreateClass() {
           });
         }
       
-      let i
-      for (i=0;i<mailarray.length;i++){
-          var current_mail=mailarray[i]
+      for (let i=0;i<mailarray.length;i++){
+          let current_mail=mailarray[i]
+          console.log(noofmods) 
+          console.log(typeof(noofmods)) 
+          let prog_array = Array(noofmods).fill(0)
+          console.log(prog_array)
           const mail_list = await db
           .collection("CreatedClasses")
           .doc(loggedUserMail)
@@ -97,7 +100,7 @@ function CreateClass() {
             email_id: current_mail,
             name: "",
             Enrolled_Status: false,
-            Progress: [],
+            Progress: prog_array,
           });
       }
         
@@ -156,7 +159,7 @@ function CreateClass() {
               className={classes.createInputFields}
               required={true}
               inputProps={{ min: 1, max: 10 }}
-              onChange={(e) => setmodcount(e.target.value)}
+              onChange={(e) => setmodcount(parseInt(e.target.value))}
             />
             <TextField
               label="Students mails"

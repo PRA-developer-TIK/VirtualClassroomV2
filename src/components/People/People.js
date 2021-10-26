@@ -46,7 +46,7 @@ export default function People({ classData ,rows }) {
           .get()
         
         var prog_array = []
-        let count = no_module_snap.size
+        let count = parseInt(no_module_snap.size)
         count == 0? prog_array = []: count == 1? prog_array=[0]:prog_array = Array(count).fill(0)
         await db
           .collection("CreatedClasses")
