@@ -10,6 +10,7 @@ import FAQ from "../FAQs/FAQ";
 import { useLocalContext } from "../Context/context";
 import People from "../People/People";
 import Assignment  from "../Assignments/Assignment";
+import Asstabforstudnets from "../Assignments/StudentsAssignment";
 function Class({ classData }) {
   const classes = useStyles();
   const { loggedUserMail, db,deleteDialog } = useLocalContext();
@@ -18,6 +19,8 @@ function Class({ classData }) {
   const [questions, setQuestions] = React.useState([]);
   const [rows,setRows]=useState([]);
   const [progress,setProgress]= useState([]);
+  const [Assignments, setAssignments] = useState([]);
+  const [StudentsAss, setStudentsAss] = useState([]);
 
   //getting modules
   useEffect(() => {
@@ -86,14 +89,8 @@ function Class({ classData }) {
           .collection("Status")
           .doc(loggedUserMail)
           .get();
-          
 
           setProgress(prog.data().Progress)
-
-
-
-
-        
       }catch (e) {
         console.log("error is ",e);
     }
@@ -101,7 +98,53 @@ function Class({ classData }) {
     
   }, [classData]);
 
-  
+  //All Assignments
+  useEffect(() => {
+    if (classData) {
+      let all_assigns=[]
+      modules.forEach(async(module)=>{
+        let unsubscribe = await db
+          .collection("CreatedClasses")
+          .doc(classData.ownerMail)
+          .collection("ClassC")
+          .doc(classData.code)
+          .collection("Modules")
+          .doc(module.modName)
+          .collection("Assignment")
+          .onSnapshot((snap) => {
+            snap.docs.map((doc) => console.log(doc.data()))
+            all_assigns.push(...(snap.docs.map((doc) => doc.data())));
+          });
+      })
+      console.log(all_assigns)
+      setAssignments(all_assigns)
+      
+    }
+  }, [classData]);
+
+  //get students assignments
+  useEffect(async() => {
+    if(classData.ownerMail!==loggedUserMail){
+      try {
+        let assignment =await db
+          .collection("CreatedClasses")
+          .doc(classData.ownerMail)
+          .collection("ClassC")
+          .doc(classData.code)
+          .collection("Status")
+          .doc(loggedUserMail)
+          .collection("Assignment")
+          .onSnapshot((snap) => {
+            setStudentsAss(snap.docs.map((doc) => doc.data()))
+          });
+
+          
+      }catch (e) {
+        console.log("error is ",e);
+    }
+    }
+    
+  }, [classData]);
   
 
   const handleChange = (event, newValue) => {
@@ -124,9 +167,11 @@ function Class({ classData }) {
           <Module modules={modules} classData={classData} progress={progress} />
         ) : value === "announce" ? (
           <Announcement classData={classData} />
-        ) : value === "classwork" ? (
-          <Assignment classData={classData} />
-        ) : value === "FAQs" ? (
+        ) : value === "classwork" && loggedUserMail === classData.ownerMail ? (
+          <Assignment classData={classData} modules={modules} Assignments={Assignments}/>
+        ) :value === "classwork" && loggedUserMail !== classData.ownerMail ? (
+          <Asstabforstudnets classData={classData} StudentsAss={StudentsAss}/>
+        ) :value === "FAQs" ? (
           <FAQ questions={questions} classData={classData} />
         ) : value === "people" ? (
           <People classData={classData} rows={rows}/>

@@ -308,7 +308,7 @@ function Module({ modules, classData,progress }) {
       </Box>
     )}
 
-    <AllModules modules={modules} classData={classData} />
+    <AllModules modules={modules} classData={classData} progress={progress}/>
     {openAddModModal && <ModInpModal addMod={handleAddModule}/>}
   </Container>
 

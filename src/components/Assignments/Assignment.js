@@ -5,28 +5,42 @@ import useStyles from "../../assets/styles/globalStyles/styles.js";
 import { useLocalContext } from "../Context/context";
 import firebase from "@firebase/app-compat";
 import { v4 as uuidv4 } from "uuid";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import AllAssignment from "./AllAssignment.js";
 import AllAnnouncements from "../Announcement/AllAnnouncements";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-function Announcement({ classData }) {
+function Assignment({ classData ,modules,Assignments}) {
     const { storage, db, loggedUserMail, loggedUser } = useLocalContext();
 
     const [inputValue, setInputValue] = useState("");
-    const [inputLinks, setInputLinks] = useState([]);
+    const [module, setModule] = React.useState("");
+    const [inputTitle, setInputTitle] = useState("");
     const [files, setFiles] = useState([]);
     const handleChange = (e) => {
 
         setFiles(Object.keys(e.target.files).map(key => (e.target.files[key])));
     };
+
+    const handleChangeModule = (event) => {
+        setModule(event.target.value);
+      };
     const handleUpload = async (e) => {
 
         let id = uuidv4();
         let dbRef = db
-            .collection("announcements")
+            .collection("CreatedClasses")
+            .doc(classData.ownerMail)
+            .collection("ClassC")
             .doc(classData.code)
-            .collection("allAnnouncements")
+            .collection("Modules")
+            .doc(module)
+            .collection("Assignment")
             .doc(id);
 
         if (files.length > 0 && inputValue) {
@@ -100,10 +114,11 @@ function Announcement({ classData }) {
                                 );
                             }
 
-                            if (inputLinks !== []) {
+                            if (inputTitle) {
                                 await dbRef.set(
                                     {
-                                        linkURL: inputLinks
+                                        Title: inputTitle,
+                                        Modname: module
                                     },
                                     { merge: true }
                                 );
@@ -121,10 +136,11 @@ function Announcement({ classData }) {
 
         } else if (inputValue) {
             try {
-                if (inputLinks !== []) {
+                if (inputTitle) {
                     await dbRef.set(
                         {
-                            linkURL: inputLinks,
+                            Title: inputTitle,
+                            Modname: module
                         },
                         { merge: true }
                     );
@@ -168,8 +184,15 @@ function Announcement({ classData }) {
                 boxShadow={6}
             >
                 <TextField
+                    fullWidth
+                    label="Title"
+                    onChange={(e) => {
+                        setInputTitle(e.target.value);
+                    }}
+                />
+                <TextField
                     id="filled-multiline-static"
-                    label="Content"
+                    label="Description"
                     multiline
                     rows={2}
                     fullWidth
@@ -179,13 +202,6 @@ function Announcement({ classData }) {
                     }}
                 />
 
-                <TextField
-                    fullWidth
-                    label="Links go here"
-                    onChange={(e) => {
-                        setInputLinks(e.target.value.split(" "));
-                    }}
-                />
 
                 <div style={{ padding: "2%" }}>
                     <label>
@@ -209,13 +225,32 @@ function Announcement({ classData }) {
 
                         </Fab>
                     </div>
+                    <FormControl
+            style={{ width: "20%", float: "right", margin: "0 2% 2% 2%" }}
+          >
+            <InputLabel  id="demo-simple-select-label">ADD TO</InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={module}
+              label="Module"
+              onChange={(e) => handleChangeModule(e)}
+            >
+              {modules.map((data, index) => (
+                <MenuItem key={index} value={data.modName}>
+                  {data.modName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
                 </div>
+                
             </Box>)
             }
-            <AllAnnouncements classData={classData} />
+            <AllAssignment classData={classData} modules={modules} Assignments={Assignments}/>
             
         </Container >
     );
 }
 
-export default Announcement;
+export default Assignment;

@@ -65,6 +65,7 @@ export default function AllModules({ classData, modules,progress }) {
     e.preventDefault();
     
     console.log("mod idx is ",idx);
+    console.log(progress);
 
       
 
@@ -82,6 +83,40 @@ export default function AllModules({ classData, modules,progress }) {
         Progress:progress,
       },{merge:true})
     
+      let assign=await db
+      .collection("CreatedClasses")
+      .doc(classData.ownerMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Modules")
+      .doc(`module${idx+1}`)
+      .collection("Assignment")
+      .get()
+      console.log(assign)
+
+      assign.forEach(async(doc)=>{
+        console.log(doc.data())
+        await db.collection("CreatedClasses")
+        .doc(classData.ownerMail)
+        .collection("ClassC")
+        .doc(classData.code)
+        .collection("Status")
+        .doc(loggedUserMail)
+        .collection("Assignment")
+        .doc(doc.data().id)
+        .set(doc.data());
+
+        await db.collection("CreatedClasses")
+        .doc(classData.ownerMail)
+        .collection("ClassC")
+        .doc(classData.code)
+        .collection("Status")
+        .doc(loggedUserMail)
+        .collection("Assignment")
+        .doc(doc.data().id)
+        .update({Marks:0,Status:false,UploadedURL:""});
+
+      })
 
 
   }

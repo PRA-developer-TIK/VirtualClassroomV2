@@ -232,7 +232,6 @@ export default function CollapsibleTable({ subMod,classData }) {
           <TableBody>
             {subMod.map((subModule, index) => (
               <>
-              <h4>Ciophers </h4>
               <Row key={index} module={subModule} classData={classData}   />
               
               </>
