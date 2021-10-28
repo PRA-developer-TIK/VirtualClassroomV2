@@ -80,8 +80,6 @@ function Assignment({ classData ,modules,Assignments}) {
                                         id: id,
                                         timestamp: firebase.firestore.Timestamp.now(),
                                         text: inputValue,
-                                        sender: loggedUserMail,
-                                        ownerAvatarURL: loggedUser.photoURL,
                                         pdfURL: firebase.firestore.FieldValue.arrayUnion(obj),
                                     },
                                     { merge: true }
@@ -92,9 +90,6 @@ function Assignment({ classData ,modules,Assignments}) {
                                         id: id,
                                         timestamp: firebase.firestore.Timestamp.now(),
                                         text: inputValue,
-                                        sender: loggedUserMail,
-                                        ownerAvatarURL: loggedUser.photoURL,
-                                        text: inputValue,
                                         imgURL: firebase.firestore.FieldValue.arrayUnion(obj),
                                     },
                                     { merge: true }
@@ -104,9 +99,6 @@ function Assignment({ classData ,modules,Assignments}) {
                                     {
                                         id: id,
                                         timestamp: firebase.firestore.Timestamp.now(),
-                                        text: inputValue,
-                                        sender: loggedUserMail,
-                                        ownerAvatarURL: loggedUser.photoURL,
                                         text: inputValue,
                                         docURL: firebase.firestore.FieldValue.arrayUnion(obj),
                                     },
@@ -150,9 +142,6 @@ function Assignment({ classData ,modules,Assignments}) {
                     {
                         id: id,
                         timestamp: firebase.firestore.Timestamp.now(),
-                        text: inputValue,
-                        sender: loggedUserMail,
-                        ownerAvatarURL: loggedUser.photoURL,
                         text: inputValue,
                         pdfURL: [],
                         docURL: [],

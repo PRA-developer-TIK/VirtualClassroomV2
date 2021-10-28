@@ -97,14 +97,9 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
 
           <div key={index} className="amt">
             <div className="amt__Cnt">
-              <div className="amt__top">
-                <Avatar src={item.ownerAvatarURL} />
-
-                <div>{item.sender}</div>
-
-              </div>
-              <p className="amt__txt">{item.Modname}</p>
-              <p className="amt__txt">{item.Title}</p>
+              <h2 className="amt__txt">{item.Title}</h2> 
+              <h5 className="amt__txt">{item.Modname}</h5>
+              <p className="amt__txt">{item.text}</p>
               {
                 item.imgURL?.map((obj, idx) => (
                   <embed key={idx} src={obj.URL} style={{ width: "100%" }} >
