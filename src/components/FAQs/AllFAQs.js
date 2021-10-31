@@ -87,7 +87,7 @@ export default function AllFAQ({questions,classData}) {
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography   >{question.question}  </Typography>
+          <Typography   >{question.name}  </Typography>
           
         </AccordionSummary>
         <AccordionDetails>
