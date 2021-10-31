@@ -35,11 +35,8 @@ export default function ImgModal({url}) {
               m: "auto"
             }}
           >
-            <img
-              src={url}
-              alt="img"
-            />
-          </Box>
+<embed  src={url} width="500" height="800" ></embed>         
+ </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Close</Button>

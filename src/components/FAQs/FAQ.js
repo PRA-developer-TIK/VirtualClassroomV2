@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Box, Container, Button } from "@material-ui/core";
+import { TextField, Box, Container, Button, Fab } from "@material-ui/core";
 import useStyles from "../../assets/styles/globalStyles/styles.js";
 import AllFAQ from "./AllFAQs";
 import firebase from "@firebase/app-compat";
@@ -8,23 +8,24 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { useLocalContext } from "../Context/context";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 function FAQ({ questions, classData }) {
   const classes = useStyles();
   let ct = 0;
 
-  const { db, storage,loggedUser } = useLocalContext();
+  const { db, storage, loggedUser } = useLocalContext();
 
   const [quesNum, setQuesNum] = useState("");
 
   const [inputQuestion, setInputQuestion] = useState("");
-  const  [inputAns,setInputAns]=useState("");
-  const [file, setFile] = useState(null);
+  const [inputAns, setInputAns] = useState("");
+  const [files, setFiles] = useState([]);
   const handleChange = (e) => {
-    setFile(e.target.files[0]);
+    setFiles(Object.keys(e.target.files).map(key => (e.target.files[key])));
   };
 
-  const handleAns=async()=>{
+  const handleAns = async () => {
     try {
       await db
         .collection("FAQs")
@@ -32,23 +33,38 @@ function FAQ({ questions, classData }) {
         .collection("allFAQs")
         .doc(quesNum)
         .set({
-          answers:firebase.firestore.FieldValue.arrayUnion({
-            avatarURL:loggedUser.photoURL,
-            answer:inputAns,
-          }) 
-        },{merge:true});
+          answers: firebase.firestore.FieldValue.arrayUnion({
+            avatarURL: loggedUser.photoURL,
+            answer: inputAns,
+          })
+        }, { merge: true });
     } catch (e) {
       alert(e);
     }
 
   }
 
-  const handleUpload = (e) => {
-    const valid = ["pdf", "docx", "png", "jpeg", "jpg"];
-    let fileType = file.name.split(".").slice(-1)[0].toLowerCase();
-    if (valid.includes(fileType)) {
-      const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
+  const handleUpload =async (e) => {
+    let id = inputQuestion;
+    let quesLen = questions.length;
+    let dbRef=db
+    .collection("FAQs")
+    .doc(classData.code)
+    .collection("allFAQs")
+    .doc(`question${++quesLen}`);
 
+    if (files.length>0 && inputQuestion) {
+    files.forEach(async(file,idx)=>{
+      let imgTypes = ["png", "jpeg", "jpg"];
+      let docTypes = [
+        "doc",
+        "docx",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+  
+      let fileType = files[idx].name.split(".").slice(-1)[0].toLowerCase();
+      const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
       uploadFile.on("state_changed", async (snapshot) => {
         let url = await storage
           .ref(`${fileType}s`)
@@ -58,28 +74,50 @@ function FAQ({ questions, classData }) {
         console.log(url);
         let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log("progress", progress);
+
+        let obj={};
+        obj.URL = url;
+        obj.name = file.name;
+        obj.timestamp = firebase.firestore.Timestamp.now();
+
         if (progress === 100) {
-          let quesLen = questions.length;
+          
           try {
-            await db
-              .collection("FAQs")
-              .doc(classData.code)
-              .collection("allFAQs")
-              .doc(`question${++quesLen}`)
+            await dbRef
               .set({
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 name: `question${quesLen}`,
-                imgURL: url,
+                ...(imgTypes.includes(fileType) && {imgURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
+                ...(fileType==="pdf" && {pdfURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
+                ...(docTypes.includes(fileType) && {docURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
+                
                 question: inputQuestion,
                 answers: [],
-              });
+              },{merge:true});
           } catch (e) {
             alert(e);
           }
         }
       });
-    } else {
-      alert("file invalid", file.name);
+
+    })
+    } else if(inputQuestion) {
+      try{
+        await dbRef
+              .set({
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                name: `question${quesLen}`,
+                question: inputQuestion,
+                answers: [],
+              });
+
+      }catch(e){
+        alert(e);
+
+      }
+      
+    }else{
+      alert("Question needed");
     }
   };
 
@@ -91,33 +129,53 @@ function FAQ({ questions, classData }) {
       <Box
         sx={{
           width: "80%",
-          border: "1px solid black",
+          border: "2px solid #9c27b0",
           padding: "2%",
           borderRadius: 10,
           m: "auto",
           mt: 1,
         }}
+
         boxShadow={6}
       >
         {!showAns && !showQues && (
-          <>
-            <button
-              onClick={() => {
-                setShowQues(true);
-              }}
-            >
-              {" "}
-              Ask
-            </button>
-            <button
-              onClick={() => {
-                setShowAns(true);
-              }}
-            >
-              {" "}
-              Answer
-            </button>
-          </>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+
+            <div style={{ margin: "1%" }}>
+              <Button
+
+
+
+                className={classes.FaqBtn}
+                variant="outlined"
+                onClick={() => {
+                  setShowQues(true);
+                }}
+
+              >
+
+
+                {" "}
+                Ask
+              </Button>
+            </div>
+
+            <div style={{ margin: "1%" }}>
+              <Button
+
+                variant="outlined"
+                className={classes.FaqBtn}
+
+                onClick={() => {
+                  setShowAns(true);
+                }}
+              >
+                {" "}
+                Answer
+              </Button>
+            </div>
+
+          </div>
         )}
 
         {showQues && (
@@ -128,37 +186,56 @@ function FAQ({ questions, classData }) {
               fullWidth
               multiline
               rows={4}
-              variant="filled"
+              variant="outlined"
               defaultValue="Default Value"
               onChange={(e) => setInputQuestion(e.target.value)}
             />
             <div style={{ padding: "2%" }}>
-              <input
-                onChange={(e) => handleChange(e)}
-                variant="outlined"
-                color="primary"
-                type="file"
-              />
+              <Fab size="small" style={{ backgroundColor: "#252934", color: "#FFF" }}>
 
-              <div style={{ float: "right" }}>
-                <button
+                <label style={{ cursor: "pointer" }}>
+                  <FileUploadIcon color="inherit" />
+                  <input
+
+                    style={{ display: "none" }}
+                    multiple
+                    onChange={(e) => handleChange(e)}
+                    variant="outlined"
+                    color="primary"
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,application/msword"
+                  />
+                </label>
+              </Fab>
+
+
+
+              <div style={{ display: "flex", float: "right" }}>
+                <Button
                   onClick={() => {
                     handleUpload();
                   }}
+                  variant="contained"
+                  color="primary"
                   className={classes.postBtn}
+
                 >
                   {" "}
                   POST
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     setShowQues(false);
                   }}
                   className={classes.postBtn}
+                  variant="contained"
+                  color="secondary"
+                  className={classes.cancelBtn}
                 >
                   {" "}
                   Cancel
-                </button>
+                </Button>
+
               </div>
             </div>
           </>
@@ -172,12 +249,13 @@ function FAQ({ questions, classData }) {
               fullWidth
               multiline
               rows={4}
-              variant="filled"
+              variant="outlined"
               defaultValue="Default Value"
               onChange={(e) => setInputAns(e.target.value)}
+              style={{ marginBottom: "1%" }}
             />
-            <FormControl style={{ width: "20%", margin: "0 2% 2% 2%" }}>
-              <InputLabel id="demo-simple-select-label">ADD TO</InputLabel>
+            <FormControl style={{ width: "12%", margin: "0 2% 2% 2%" }}>
+              <InputLabel id="demo-simple-select-label">ANS TO</InputLabel>
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
@@ -185,7 +263,6 @@ function FAQ({ questions, classData }) {
                 label="Module"
                 onChange={(e) => {
                   setQuesNum(e.target.value);
-                  
                 }}
               >
                 {questions.map((ques, index) => (
@@ -195,8 +272,8 @@ function FAQ({ questions, classData }) {
                 ))}
               </Select>
             </FormControl>
-            <div style={{ float: "right" }}>
-              <button
+            <div style={{ margin: "1%", display: "flex", float: "right" }}>
+              <Button
                 onClick={() => {
                   handleAns();
                 }}
@@ -204,16 +281,16 @@ function FAQ({ questions, classData }) {
               >
                 {" "}
                 Ans
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   setShowAns(false);
                 }}
-                className={classes.postBtn}
+                className={classes.cancelBtn}
               >
                 {" "}
                 Cancel
-              </button>
+              </Button>
             </div>
           </>
         )}

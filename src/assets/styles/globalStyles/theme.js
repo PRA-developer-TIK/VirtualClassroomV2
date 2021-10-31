@@ -7,9 +7,7 @@ const customTheme=createTheme({
             main:"#252934",
         },
         secondary:{
-            main:"#bd37b6",
-            
-            
+            main:"#bd37b6",  
         }
         
 

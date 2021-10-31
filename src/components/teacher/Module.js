@@ -249,14 +249,14 @@ function Module({ modules, classData, progress }) {
             id="filled-multiline-static"
             label="Title"
             fullWidth
-            variant="filled"
+            variant="outlined"
             onChange={(e) => {
               setInputTitle(e.target.value);
             }}
           />
 
           <TextField
-          
+            variant="outlined"
             fullWidth
             label="Links goes here"
             onChange={(e) => {

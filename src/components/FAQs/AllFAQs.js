@@ -10,11 +10,18 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import { Box,Modal,TextField} from "@material-ui/core";
 import useStyles from "../../assets/styles/globalStyles/styles";
-import ImageIcon from '@mui/icons-material/Image';
 import ImgModal from "../teacher/ImageModal";
 import { useLocalContext } from "../Context/context";
 import DeleteIcon from '@mui/icons-material/Delete';
 import firebase from "@firebase/app-compat";
+import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import ImageIcon from "@mui/icons-material/Image";
+
+
 
 export default function AllFAQ({questions,classData}) {
   const classes = useStyles();
@@ -51,25 +58,32 @@ export default function AllFAQ({questions,classData}) {
   return(
     <>
     {questions.map((question,index)=>(
-      <div
+    //   <div
+    //   key={index}
+    //   style={{
+    //     width: "80%",
+    //     margin: "auto",
+    //     marginTop: "2%",
+    //     border: "1px solid black",
+    //     display:"flex",
+
+    //   }}
+    // >
+      <Accordion
       key={index}
       style={{
         width: "80%",
         margin: "auto",
         marginTop: "2%",
-        border: "1px solid black",
-        display:"flex",
+        border: "2px solid #f44336",
+        
+        borderRadius:5
 
       }}
-    >
-      <Accordion
-        sx={{
-          mt: 1,
-          width:"100%"
-        }}
+        
       >
         <AccordionSummary
-          expandIcon={question.imgURL!==""? <ImageIcon sx={{m:1}} onClick={(e)=>{setOpenImg(true);setUrl(question.imgURL);console.log(url)}}/>:<ExpandMoreIcon onClick={handleOpen}/>}
+          expandIcon={question.imgURL!==""? <NotListedLocationIcon sx={{m:1,color:"#d50000 "}} onClick={(e)=>{setOpenImg(true);setUrl(question.imgURL);console.log(url)}}/>:null}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
@@ -77,11 +91,21 @@ export default function AllFAQ({questions,classData}) {
           
         </AccordionSummary>
         <AccordionDetails>
+          { question.pdfURL?.map((pdf,idx)=>(
+            
+            <Chip onClick={(e)=>{setOpenImg(true);setUrl(pdf.URL);console.log(url)}} style={{margin:"1%"}} size="small" icon={<PictureAsPdfIcon />} label={pdf.name} />
+            
+          
+      
+          ))
+
+          }
           {question.answers.map((ans,idx)=>(
             <ListItem
             key={idx}
             alignItems="flex-start"
-            style={{ border: "1px solid black" }}
+            style={{ border: "2px solid #aeea00",borderRadius:5,marginBottom:"1%" }}
+            
           >
             <ListItemAvatar>
               <Avatar alt="avtUrl" src={ans.avatarURL} />
@@ -95,9 +119,10 @@ export default function AllFAQ({questions,classData}) {
           </ListItem>
           ))}
         </AccordionDetails>
+        {openImg && <ImgModal  url={url}/>}
       </Accordion>
-      {openImg && <ImgModal  url={url}/>}
-    </div>
+      
+    // </div>
     ))}
     </>
   )

@@ -6,10 +6,10 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(2),
-    minHeight:"100vh",
-    backgroundImage:`url()`,
-    backgroundRepeat:"no-repeat",
-    backgroundSize:"cover"
+    minHeight: "100vh",
+    backgroundImage: `url()`,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover"
   },
   inputFields: {
     margin: "5px",
@@ -48,16 +48,39 @@ const useStyles = makeStyles((theme) => ({
   pageBody: {
     backgroundColor: "#ffeb3b",
   },
-  postBtn: {
-    backgroundColor: "green",
-    color: "#FFF",
-    padding: "20%",
-    display: "inline-block",
-  },
-  listImg:{width:"5%",margin:"auto"},
-  backGround:{
+  
+  listImg: { width: "5%", margin: "auto" },
+  FaqBtn: {
+    backgroundColor: '#ba68c8',
+    border :"2px solid #252934",
+    color: '#fff',
 
+    '&:hover': {
+      backgroundColor: '#252934',
+      color: '#fff',
+      border :"2px solid #ba68c8",
+
+    },
+  },
+  postBtn:{
+    margin:"5%",
+    backgroundColor: "#bd37b6",
+    color: "#FFF",
+    '&:hover': {
+      backgroundColor: '#64dd17',
+    }
+
+  },
+  cancelBtn:{
+    margin:"5%",
+    
+    backgroundColor: "#c62828",
+    color: "#FFF",
+    '&:hover': {
+      backgroundColor: '#f44336',
+    }
   }
+
 }));
 
 export default useStyles;
