@@ -6,6 +6,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import Layout from "./components/Layout/Layout";
 //import routes
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { CssBaseline } from "@material-ui/core";
+
 
 //components import
 import Navbar from "./components/navbar/Navbar";
@@ -13,13 +15,15 @@ import Login from "./components/userDetails/Login";
 import AllClasses from "./components/Home/AllClasses";
 import Class from "./components/teacher/Class";
 import { useLocalContext } from "./components/Context/context";
+import Footer from "./components/Footer/Footer";
+
 
 function App() {
   const [createdClasses, setCreatedClasses] = useState([]);
   const [joinedClasses, setJoinedClasses] = useState([]);
   const [modules,setModules]=useState([]);
 
-  const { db, auth, loggedUser, loggedUserMail } = useLocalContext();
+  const { db, auth, loggedUser, loggedUserMail,classes } = useLocalContext();
 
   //getting all user created classes
   useEffect(() => {
@@ -57,9 +61,16 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      
+       
       <Router>
+      
         <Navbar />
-        <Layout>
+        <div className={classes.root}>
+        <Layout >
+        <CssBaseline/>
+          
+         
           <Switch>
             {createdClasses.map((classData, index) => (
               <Route key={index} path={`/${classData.code}`} exact>
@@ -83,8 +94,12 @@ function App() {
               <Login />
             </Route>
           </Switch>
+         
         </Layout>
+        </div>
       </Router>
+      
+      {/* <Footer/> */}
     </ThemeProvider>
   );
 }

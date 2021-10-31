@@ -1,10 +1,17 @@
 import { createTheme } from '@mui/material/styles';
+import { purple } from '@mui/material/colors';
 const customTheme=createTheme({
     //colors
     palette:{
         primary :{
-            main:"#212118",
+            main:"#252934",
         },
+        secondary:{
+            main:"#bd37b6",
+            
+            
+        }
+        
 
     },
     //typography fpr fonts

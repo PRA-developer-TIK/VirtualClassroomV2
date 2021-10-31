@@ -1,5 +1,6 @@
 import { createContext,useContext,useState,useEffect } from "react";
 import db,{storage,auth,provider} from "../../firebase/config";
+import useStyles from  "../../assets/styles/globalStyles/styles"
 
 const AddContext=createContext();
 
@@ -16,6 +17,7 @@ export const ContextProvider=({children})=>{
     const [deleteDialog,setDeleteDialog]=useState(false);
     const [openAddModModal,setOpenAddModModal]=useState(false);
     const [modNo,setModNo]=useState(0);
+    const classes=useStyles();
     
 
 
@@ -57,7 +59,7 @@ export const ContextProvider=({children})=>{
         openImg,setOpenImg,
         deleteDialog,setDeleteDialog,
         openAddModModal,setOpenAddModModal,
-        modNo,setModNo
+        modNo,setModNo,classes
         
       };
     return (

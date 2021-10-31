@@ -6,6 +6,10 @@ const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     padding: theme.spacing(2),
+    minHeight:"100vh",
+    backgroundImage:`url()`,
+    backgroundRepeat:"no-repeat",
+    backgroundSize:"cover"
   },
   inputFields: {
     margin: "5px",
@@ -51,6 +55,9 @@ const useStyles = makeStyles((theme) => ({
     display: "inline-block",
   },
   listImg:{width:"5%",margin:"auto"},
+  backGround:{
+
+  }
 }));
 
 export default useStyles;

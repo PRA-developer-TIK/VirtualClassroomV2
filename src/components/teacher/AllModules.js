@@ -158,24 +158,29 @@ export default function AllModules({ classData, modules,progress }) {
 
           }}
           key={index}
+
+          
           style={{
             
             width: "80%",
             margin: "auto",
             marginTop: "2%",
-            border: "1px solid red",
+            border: "2px solid #bd37b6",
             display: "block",
+            color:"#252934",
+            backgroundColor:"#f5f5f5",
+            borderRadius:5,
           }}
             expanded={expanded === `${data.modName}`}
             onChange={handleChange(data.modName)}
             sx={{
               mt: 1,
-              backgroundColor:"black",
-              color:"red"
+              
+           
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon style={{color:"red"}} />}
+              expandIcon={<ExpandMoreIcon style={{color:"	#252934"}} />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >

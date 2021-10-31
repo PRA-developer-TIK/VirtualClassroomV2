@@ -216,7 +216,7 @@ export default function CollapsibleTable({ subMod,classData }) {
   return (
     <>
     
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{bgcolor:"#f3e5f5",border:"1px solid #252934"}}>
         <Table aria-label="collapsible table">
           <TableHead>
             <TableRow>

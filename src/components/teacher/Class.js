@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import { Container } from "@mui/material";
+import { Container,Button } from "@mui/material";
 import Module from "./Module";
 import Announcement from "../Announcement/Announcement";
 import FAQ from "../FAQs/FAQ";
@@ -21,6 +21,8 @@ function Class({ classData }) {
   const [progress,setProgress]= useState([]);
   const [Assignments, setAssignments] = useState([]);
   const [StudentsAss, setStudentsAss] = useState([]);
+
+
 
   //getting modules
   useEffect(() => {
@@ -153,16 +155,26 @@ function Class({ classData }) {
 
   return (
     <>
-      <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
+      <Box sx={{ width: "100%" }}>
         <Tabs value={value} onChange={handleChange} centered>
           <Tab value="module" label="Modules" />
           <Tab value="announce" label="Announcements" />
           <Tab value="classwork" label="task" />
           <Tab value="FAQs" label="FAQs" />
           <Tab value="people" label="People" />
+        {/* <Button variant="outlined" onClick={(e)=>handleChange(e,"module")} sx={{m:1,border: "2px solid #bd37b6",}}>Modules</Button>
+        <Button variant="outlined" onClick={(e)=>handleChange(e,"announce")} sx={{m:1}}>Announcements</Button>
+        <Button variant="outlined" onClick={(e)=>handleChange(e,"classwork")} sx={{m:1}}>task</Button>
+        <Button variant="outlined" onClick={(e)=>handleChange(e,"FAQs")} sx={{m:1}}>Discuss</Button>
+        <Button variant="outlined" onClick={(e)=>handleChange(e,"people")} sx={{m:1}}>People</Button>
+         */}
+
         </Tabs>
+        
+
       </Box>
       <Container>
+
         {value === "module" ? (
           <Module modules={modules} classData={classData} progress={progress} />
         ) : value === "announce" ? (
