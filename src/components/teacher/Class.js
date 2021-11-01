@@ -39,7 +39,24 @@ function Class({ classData }) {
         .doc(classData.code)
         .collection("Modules")
         .onSnapshot((snap) => {
-          setModules(snap.docs.map((doc) => doc.data()));
+          let temp_modules=snap.docs.map((doc) => doc.data())
+          setModules(temp_modules);
+          let all_assigns=[]
+          temp_modules.forEach(async(module)=>{
+            let unsubscribe = await db
+              .collection("CreatedClasses")
+              .doc(classData.ownerMail)
+              .collection("ClassC")
+              .doc(classData.code)
+              .collection("Modules")
+              .doc(module.modName)
+              .collection("Assignment")
+              .onSnapshot((snap) => {
+                snap.docs.map((doc) => console.log(doc.data()))
+                all_assigns.push(...(snap.docs.map((doc) => doc.data())));
+              });
+      })
+      setAssignments(all_assigns)
         });
       return () => unsubscribe();
     }
@@ -94,34 +111,10 @@ function Class({ classData }) {
 
           setProgress(prog.data().Progress)
       }catch (e) {
-        console.log("error is ",e);
+        console.log(e);
     }
     }
     
-  }, [classData]);
-
-  //All Assignments
-  useEffect(() => {
-    if (classData) {
-      let all_assigns=[]
-      modules.forEach(async(module)=>{
-        let unsubscribe = await db
-          .collection("CreatedClasses")
-          .doc(classData.ownerMail)
-          .collection("ClassC")
-          .doc(classData.code)
-          .collection("Modules")
-          .doc(module.modName)
-          .collection("Assignment")
-          .onSnapshot((snap) => {
-            snap.docs.map((doc) => console.log(doc.data()))
-            all_assigns.push(...(snap.docs.map((doc) => doc.data())));
-          });
-      })
-      console.log(all_assigns)
-      setAssignments(all_assigns)
-      
-    }
   }, [classData]);
 
   //get students assignments
@@ -142,7 +135,7 @@ function Class({ classData }) {
 
           
       }catch (e) {
-        console.log("error is ",e);
+        console.log(e);
     }
     }
     

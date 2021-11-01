@@ -114,7 +114,7 @@ export default function AllModules({ classData, modules,progress }) {
         .doc(loggedUserMail)
         .collection("Assignment")
         .doc(doc.data().id)
-        .update({Marks:0,Status:false,UploadedURL:""});
+        .update({Marks:-1,Status:false,UploadedURL:""});
 
       })
 

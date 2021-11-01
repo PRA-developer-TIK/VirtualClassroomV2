@@ -43,9 +43,6 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log("progress", progress);
   
-            let obj = {};
-            obj.URL = url;
-            obj.name = file.name;
   
   
             if (progress === 100) {
@@ -54,7 +51,8 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
                 if (fileType === "pdf") {
                   await dbRef.set(
                     {
-                      UploadedURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                      Status: true,
+                      UploadedURL: firebase.firestore.FieldValue.arrayUnion(url),
                     },
                     { merge: true }
                   );
