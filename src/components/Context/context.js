@@ -17,6 +17,7 @@ export const ContextProvider=({children})=>{
     const [deleteDialog,setDeleteDialog]=useState(false);
     const [openAddModModal,setOpenAddModModal]=useState(false);
     const [modNo,setModNo]=useState(0);
+    const [url,setUrl]=useState("");
     const classes=useStyles();
     
 
@@ -59,7 +60,8 @@ export const ContextProvider=({children})=>{
         openImg,setOpenImg,
         deleteDialog,setDeleteDialog,
         openAddModModal,setOpenAddModModal,
-        modNo,setModNo,classes
+        modNo,setModNo,classes,
+        url,setUrl
         
       };
     return (

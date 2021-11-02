@@ -232,7 +232,8 @@ function Module({ modules, classData, progress }) {
         <Box
           sx={{
             width: "80%",
-            border: "2px solid #bd37b6",
+            // border: "2px solid #bd37b6",
+            border: "2px solid #9c27b0",
             padding: "2%",
             borderRadius: 10,
             m: "auto",

@@ -24,11 +24,10 @@ export default function AllModules({ classData, modules,progress }) {
   
 
 
-  const { loggedUserMail, db, openImg, setOpenImg } = useLocalContext();
+  const { loggedUserMail, db, openImg, setOpenImg,url } = useLocalContext();
 
   //open closing accordion
   const [open, setOpen] = React.useState(false);
-  const [url, setUrl] = useState("");
   const handleOpen = () => setOpen(true);
 
   //acccordion controlled
@@ -165,9 +164,13 @@ export default function AllModules({ classData, modules,progress }) {
             width: "80%",
             margin: "auto",
             marginTop: "2%",
-            border: "2px solid #bd37b6",
+            // border: "2px solid #bd37b6",
+            border: "2px solid #252934",
+           
             display: "block",
-            color:"#252934",
+            // color:"#252934",
+            color:"#9c27b0",
+            
             backgroundColor:"#f5f5f5",
             borderRadius:5,
           }}
@@ -180,7 +183,7 @@ export default function AllModules({ classData, modules,progress }) {
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon style={{color:"	#252934"}} />}
+              expandIcon={<ExpandMoreIcon style={{color:"	#bd37b6"}} />}
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
@@ -212,9 +215,13 @@ export default function AllModules({ classData, modules,progress }) {
               
               <SubModTable subMod={subModules} classData={classData} />
             </AccordionDetails>
+            
+
           </Accordion>
         // </div>
+        
       ))}
+      {openImg && <ImgModal url={url} />}
     </>
   );
 }
