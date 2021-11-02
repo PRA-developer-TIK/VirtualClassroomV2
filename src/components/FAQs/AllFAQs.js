@@ -17,7 +17,7 @@ import firebase from "@firebase/app-compat";
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import LinkIcon from "@mui/icons-material/Link";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ImageIcon from "@mui/icons-material/Image";
 
@@ -87,36 +87,51 @@ export default function AllFAQ({ questions, classData }) {
             aria-controls="panel1a-content"
             id="panel1a-header"
           >
-            <Typography   >{question.name}  </Typography>
+            <Typography   >{question.question}  </Typography>
 
           </AccordionSummary>
           <AccordionDetails>
             <div>
-            {question.pdfURL?.map((pdf, idx) => (
+              {question.pdfURL?.map((pdf, idx) => (
 
-              <Chip color="primary"
-                onClick={(e) => { setOpenImg(true); setUrl(pdf.URL); console.log(url) }} style={{ margin: "1%" }}
-                size="small" icon={<PictureAsPdfIcon />}
-                label={pdf.name}
-              />
-            ))
+                <Chip color="primary"
+                  onClick={(e) => { setOpenImg(true); setUrl(pdf.URL); console.log(url) }} style={{ margin: "1%" }}
+                  size="small" icon={<PictureAsPdfIcon />}
+                  label={pdf.name}
+                />
+              ))
 
 
-            }
+              }
             </div>
 
             <div>
-            {question.imgURL?.map((pdf, idx) => (
+              {question.imgURL?.map((pdf, idx) => (
 
-              <Chip color="secondary"
-                onClick={(e) => { setOpenImg(true); setUrl(pdf.URL); console.log(url) }} style={{ margin: "1%" }}
-                size="small" icon={<ImageIcon />}
-                label={pdf.name}
-              />
-            ))
+                <Chip color="secondary"
+                  onClick={(e) => { setOpenImg(true); setUrl(pdf.URL); console.log(url) }} style={{ margin: "1%" }}
+                  size="small" icon={<ImageIcon />}
+                  label={pdf.name}
+                />
+              ))
 
 
-            }
+              }
+            </div>
+
+            <div>
+              {question.linkURL?.map((URL, idx) => (
+
+                <a style={{ textDecoration: "none",  }} href={URL.substr(0, 7) === "http://" ? URL : `http://${URL}`} target="_blank" rel="noreferrer" >
+                  <Chip color="info"
+                  style={{ margin: "1%",cursor: "pointer" }}
+                  size="small" icon={<LinkIcon />}
+                  label={URL}
+                /></a>
+              ))
+
+
+              }
             </div>
 
             {question.answers.map((ans, idx) => (

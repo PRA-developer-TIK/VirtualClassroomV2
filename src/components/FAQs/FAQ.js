@@ -17,6 +17,8 @@ function FAQ({ questions, classData }) {
   const { db, storage, loggedUser } = useLocalContext();
 
   const [quesNum, setQuesNum] = useState("");
+  const [inputLinks, setInputLinks] = useState([]);
+  const [ansQues,setAnsQues]=useState("");
 
   const [inputQuestion, setInputQuestion] = useState("");
   const [inputAns, setInputAns] = useState("");
@@ -25,13 +27,13 @@ function FAQ({ questions, classData }) {
     setFiles(Object.keys(e.target.files).map(key => (e.target.files[key])));
   };
 
-  const handleAns = async () => {
+  const handleAns = async (ques) => {
     try {
       await db
         .collection("FAQs")
         .doc(classData.code)
         .collection("allFAQs")
-        .doc(quesNum)
+        .doc(ques)
         .set({
           answers: firebase.firestore.FieldValue.arrayUnion({
             avatarURL: loggedUser.photoURL,
@@ -44,79 +46,96 @@ function FAQ({ questions, classData }) {
 
   }
 
-  const handleUpload =async (e) => {
+  const handleUpload = async (e) => {
     let id = inputQuestion;
     let quesLen = questions.length;
-    let dbRef=db
-    .collection("FAQs")
-    .doc(classData.code)
-    .collection("allFAQs")
-    .doc(`question${++quesLen}`);
+    let dbRef = db
+      .collection("FAQs")
+      .doc(classData.code)
+      .collection("allFAQs")
+      .doc(inputQuestion);
 
-    if (files.length>0 && inputQuestion) {
-    files.forEach(async(file,idx)=>{
-      let imgTypes = ["png", "jpeg", "jpg"];
-      let docTypes = [
-        "doc",
-        "docx",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      ];
-  
-      let fileType = files[idx].name.split(".").slice(-1)[0].toLowerCase();
-      const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
-      uploadFile.on("state_changed", async (snapshot) => {
-        let url = await storage
-          .ref(`${fileType}s`)
-          .child(file.name)
-          .getDownloadURL();
-        console.log("code is", classData.code);
-        console.log(url);
-        let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("progress", progress);
+    if (files.length > 0 && inputQuestion) {
+      files.forEach(async (file, idx) => {
+        let imgTypes = ["png", "jpeg", "jpg"];
+        let docTypes = [
+          "doc",
+          "docx",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ];
 
-        let obj={};
-        obj.URL = url;
-        obj.name = file.name;
-        obj.timestamp = firebase.firestore.Timestamp.now();
+        let fileType = files[idx].name.split(".").slice(-1)[0].toLowerCase();
+        const uploadFile = storage.ref(`${fileType}s/${file.name}`).put(file);
+        uploadFile.on("state_changed", async (snapshot) => {
+          let url = await storage
+            .ref(`${fileType}s`)
+            .child(file.name)
+            .getDownloadURL();
+          console.log("code is", classData.code);
+          console.log(url);
+          let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("progress", progress);
 
-        if (progress === 100) {
-          
-          try {
-            await dbRef
-              .set({
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                name: `question${quesLen}`,
-                ...(imgTypes.includes(fileType) && {imgURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
-                ...(fileType==="pdf" && {pdfURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
-                ...(docTypes.includes(fileType) && {docURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
-                
-                question: inputQuestion,
-                answers: [],
-              },{merge:true});
-          } catch (e) {
-            alert(e);
+          let obj = {};
+          obj.URL = url;
+          obj.name = file.name;
+          obj.timestamp = firebase.firestore.Timestamp.now();
+
+          if (progress === 100) {
+
+            try {
+              await dbRef
+                .set({
+                  timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                  name: `question${quesLen}`,
+                  ...(imgTypes.includes(fileType) && { imgURL: firebase.firestore.FieldValue.arrayUnion(obj) }),
+                  ...(fileType === "pdf" && { pdfURL: firebase.firestore.FieldValue.arrayUnion(obj) }),
+                  // ...(docTypes.includes(fileType) && {docURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
+
+                  question: inputQuestion,
+                  answers: [],
+                }, { merge: true });
+            } catch (e) {
+              alert(e);
+            }
           }
-        }
-      });
+        });
 
-    })
-    } else if(inputQuestion) {
-      try{
+      })
+    } else if (inputQuestion && inputLinks) {
+      try {
         await dbRef
-              .set({
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                name: `question${quesLen}`,
-                question: inputQuestion,
-                answers: [],
-              });
+          .set({
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            name: `question${quesLen}`,
+            question: inputQuestion,
+            linkURL: inputLinks,
+            answers: [],
+          }, { merge: true });
 
-      }catch(e){
+      } catch (e) {
         alert(e);
 
       }
-      
-    }else{
+
+
+    } else if (inputQuestion) {
+      try {
+        await dbRef
+          .set({
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            name: `question${quesLen}`,
+            question: inputQuestion,
+            answers: [],
+          });
+
+      } catch (e) {
+        alert(e);
+
+      }
+
+    } else {
       alert("Question needed");
     }
   };
@@ -180,6 +199,7 @@ function FAQ({ questions, classData }) {
 
         {showQues && (
           <>
+          <div style={{margin:"1%"}}>
             <TextField
               id="filled-multiline-static"
               label="Ask Question"
@@ -190,6 +210,20 @@ function FAQ({ questions, classData }) {
               defaultValue="Default Value"
               onChange={(e) => setInputQuestion(e.target.value)}
             />
+            </div>
+            <div style={{margin:"1%"}}>
+            <TextField
+              variant="outlined"
+              fullWidth
+              label="Links goes here"
+              onChange={(e) => {
+                setInputLinks(e.target.value.split(" "));
+              }}
+              helperText={`${inputLinks.length} links added`}
+            />
+            </div>
+
+
             <div style={{ padding: "2%" }}>
               <Fab size="small" style={{ backgroundColor: "#252934", color: "#FFF" }}>
 
@@ -203,10 +237,12 @@ function FAQ({ questions, classData }) {
                     variant="outlined"
                     color="primary"
                     type="file"
-                    accept=".png,.jpg,.jpeg,.pdf,.doc"
+                    accept=".png,.jpg,.jpeg,.pdf"
                   />
                 </label>
               </Fab>
+
+
 
 
 
@@ -266,8 +302,8 @@ function FAQ({ questions, classData }) {
                 }}
               >
                 {questions.map((ques, index) => (
-                  <MenuItem key={index} value={ques.name}>
-                    {ques.name}
+                  <MenuItem key={index} value={ques.name} onClick={()=>setAnsQues(ques.question)}>
+                    {ques.question}
                   </MenuItem>
                 ))}
               </Select>
@@ -275,7 +311,7 @@ function FAQ({ questions, classData }) {
             <div style={{ margin: "1%", display: "flex", float: "right" }}>
               <Button
                 onClick={() => {
-                  handleAns();
+                  handleAns(ansQues);
                 }}
                 className={classes.postBtn}
               >

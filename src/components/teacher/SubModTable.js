@@ -28,7 +28,7 @@ function Row({ module, classData }) {
   // console.log("module is ",module)
   const [open, setOpen] = useState(false)
 
-  const { db, loggedUserMail, setOpenImg, setUrl } = useLocalContext();
+  const { db, loggedUserMail, setOpenImg, setUrl ,setOpenFileType} = useLocalContext();
 
   const handleDelFile = async (type, data, id) => {
     console.log(type, data, id);
@@ -144,7 +144,7 @@ function Row({ module, classData }) {
                       </TableCell>
                       <TableCell>{data.timestamp.toDate().toLocaleTimeString()}</TableCell>
                       <TableCell>{data.name.slice(0, 10)}...</TableCell>
-                      <TableCell align="center"><InsertDriveFileIcon onClick={() => { setOpenImg(true); setUrl(data.URL) }} /></TableCell>
+                      <TableCell align="center"><InsertDriveFileIcon onClick={() => { setOpenImg(true); setUrl(data.URL);setOpenFileType("doc") }} /></TableCell>
                       {loggedUserMail === classData.ownerMail &&
                         (<TableCell align="center">< DeleteIcon onClick={() => {
                           // setDeleteDialog(true);
