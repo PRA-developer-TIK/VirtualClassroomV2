@@ -21,6 +21,7 @@ function Class({ classData }) {
   const [progress,setProgress]= useState([]);
   const [Assignments, setAssignments] = useState([]);
   const [StudentsAss, setStudentsAss] = useState([]);
+  const [studentsdata,setstudents]= useState([]);
 
 
 
@@ -94,34 +95,60 @@ function Class({ classData }) {
 
           setProgress(prog.data().Progress)
       }catch (e) {
-        console.log("error is ",e);
+        console.log(e);
     }
     }
     
   }, [classData]);
 
-  //All Assignments
-  useEffect(() => {
-    if (classData) {
-      let all_assigns=[]
-      modules.forEach(async(module)=>{
+  //get assignments
+  useEffect(async() => {
+    if(classData){
+      try {
         let unsubscribe = await db
-          .collection("CreatedClasses")
-          .doc(classData.ownerMail)
-          .collection("ClassC")
-          .doc(classData.code)
-          .collection("Modules")
-          .doc(module.modName)
-          .collection("Assignment")
-          .onSnapshot((snap) => {
-            snap.docs.map((doc) => console.log(doc.data()))
-            all_assigns.push(...(snap.docs.map((doc) => doc.data())));
-          });
-      })
-      console.log(all_assigns)
-      setAssignments(all_assigns)
-      
+            .collection("CreatedClasses")
+            .doc(classData.ownerMail)
+            .collection("ClassC")
+            .doc(classData.code)
+            .collection("Assignment")
+            .onSnapshot((snap) => {
+              let temp_assigns=snap.docs.map((doc) => doc.data())
+              setAssignments(snap.docs.map((doc) => doc.data()))
+              
+              temp_assigns.forEach(async(doc)=>{
+                  if(loggedUserMail!=classData.ownerMail){
+                    try {
+                      let assignment = await db
+                        .collection("CreatedClasses")
+                        .doc(classData.ownerMail)
+                        .collection("ClassC")
+                        .doc(classData.code)
+                        .collection("Assignment")
+                        .doc(doc.id)
+                        .collection("Submissions")
+                        .doc(loggedUserMail)
+                        .get()
+
+                        if(assignment.exists){
+                          let temp_students_assign=StudentsAss
+                          temp_students_assign.push(assignment.data())
+                          setStudentsAss(temp_students_assign)
+                        }
+              
+                        
+                    }catch (e) {
+                      console.log(e);
+                  }
+                }
+              });
+            });
+
+          
+      }catch (e) {
+        console.log(e);
     }
+    }
+    
   }, [classData]);
 
   //get students assignments
@@ -142,12 +169,32 @@ function Class({ classData }) {
 
           
       }catch (e) {
-        console.log("error is ",e);
+        console.log(e);
     }
     }
     
   }, [classData]);
   
+  //getting people data for assignment
+  useEffect(() => {
+    if(classData){
+    try {
+      let unsubscribe = db
+        .collection("CreatedClasses")
+        .doc(classData.ownerMail)
+        .collection("ClassC")
+        .doc(classData.code)
+        .collection("Status")
+        .where("Enrolled_Status", "==", true)
+        .onSnapshot((snap) => {
+          setstudents(snap.docs.map((doc) => doc.data()));
+        });
+      
+    }catch (e) {
+      console.log(e);
+    }
+  }
+  }, [classData]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -180,7 +227,7 @@ function Class({ classData }) {
         ) : value === "announce" ? (
           <Announcement classData={classData} />
         ) : value === "classwork" && loggedUserMail === classData.ownerMail ? (
-          <Assignment classData={classData} modules={modules} Assignments={Assignments}/>
+          <Assignment classData={classData} modules={modules} Assignments={Assignments} studentsdata={studentsdata}/>
         ) :value === "classwork" && loggedUserMail !== classData.ownerMail ? (
           <Asstabforstudnets classData={classData} StudentsAss={StudentsAss}/>
         ) :value === "FAQs" ? (

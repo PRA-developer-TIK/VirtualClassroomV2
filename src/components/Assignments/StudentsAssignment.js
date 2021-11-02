@@ -22,10 +22,10 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
         .doc(classData.ownerMail)
         .collection("ClassC")
         .doc(classData.code)
-        .collection("Status")
-        .doc(loggedUserMail)
         .collection("Assignment")
-        .doc(id);
+        .doc(id)
+        .collection("Submissions")
+        .doc(loggedUserMail);
   
       if (files.length > 0) {
         files.forEach(async (file,idx) => {
@@ -42,10 +42,11 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
             let progress =
               (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log("progress", progress);
-  
+
             let obj = {};
             obj.URL = url;
             obj.name = file.name;
+  
   
   
             if (progress === 100) {
@@ -54,6 +55,7 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
                 if (fileType === "pdf") {
                   await dbRef.set(
                     {
+                      Status: true,
                       UploadedURL: firebase.firestore.FieldValue.arrayUnion(obj),
                     },
                     { merge: true }
@@ -137,7 +139,7 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
               onChange={(e) => handleChange(e)}
               multiple
               type="file"
-              accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              accept=".pdf"
               style={{ display: "none" }}
             />
           </label>
