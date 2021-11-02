@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Box, Container, Button } from "@material-ui/core";
+import { TextField, Box, Container, Fab } from "@material-ui/core";
 import { width } from "@mui/system";
 import useStyles from "../../assets/styles/globalStyles/styles.js";
 import { useLocalContext } from "../Context/context";
@@ -7,6 +7,7 @@ import firebase from "@firebase/app-compat";
 import { v4 as uuidv4 } from "uuid";
 import AllAnnouncements from "./AllAnnouncements";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
+import SendIcon from '@mui/icons-material/Send';
 function Announcement({ classData }) {
   const { storage, db, loggedUserMail, loggedUser } = useLocalContext();
 
@@ -57,7 +58,7 @@ function Announcement({ classData }) {
           if (progress === 100) {
             console.log("filetyoe is ",fileType);
             try {
-              if (fileType === "pdf") {
+             
                 await dbRef.set(
                   {
                     id: id,
@@ -65,37 +66,12 @@ function Announcement({ classData }) {
                     text: inputValue,
                     sender: loggedUserMail,
                     ownerAvatarURL: loggedUser.photoURL,
-                    pdfURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                ...(imgTypes.includes(fileType) && {imgURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
+                ...(fileType==="pdf" && {pdfURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
+                ...(docTypes.includes(fileType) && {docURL: firebase.firestore.FieldValue.arrayUnion(obj)}),
                   },
                   { merge: true }
                 );
-              } else if (imgTypes.includes(fileType)) {
-                await dbRef.set(
-                  {
-                    id: id,
-                    timestamp : firebase.firestore.Timestamp.now(),
-                    text: inputValue,
-                    sender: loggedUserMail,
-                    ownerAvatarURL: loggedUser.photoURL,
-                    text: inputValue,
-                    imgURL: firebase.firestore.FieldValue.arrayUnion(obj),
-                  },
-                  { merge: true }
-                );
-              } else if (docTypes.includes(fileType)) {
-                await dbRef.set(
-                  {
-                    id: id,
-                    timestamp : firebase.firestore.Timestamp.now(),
-                    text: inputValue,
-                    sender: loggedUserMail,
-                    ownerAvatarURL: loggedUser.photoURL,
-                    text: inputValue,
-                    docURL: firebase.firestore.FieldValue.arrayUnion(obj),
-                  },
-                  { merge: true }
-                );
-              }
 
               if (inputLinks !== []) {
                 await dbRef.set(
@@ -148,6 +124,8 @@ function Announcement({ classData }) {
       alert("input value needed")
     }
 
+    setInputLinks([]);
+    setInputValue("");
   };
   const classes = useStyles();
 
@@ -171,6 +149,7 @@ function Announcement({ classData }) {
           rows={2}
           fullWidth
           variant="filled"
+          defaultValue={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
           }}
@@ -185,26 +164,29 @@ function Announcement({ classData }) {
         />
 
         <div style={{ padding: "2%" }}>
+          <button>
           <label>
             <FileUploadIcon />
             <input
               onChange={(e) => handleChange(e)}
               multiple
               type="file"
-              accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              accept=".png,.jpg,.jpeg,.pdf,.doc,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               style={{ display: "none" }}
             />
           </label>
+          </button>
 
           <div style={{ float: "right" }}>
-            <button
+            <button size="small" 
               onClick={(e) => {
                 handleUpload(e);
               }}
               className={classes.postBtn}
+              
             >
               {" "}
-              POST
+              <SendIcon/>
             </button>
           </div>
         </div>

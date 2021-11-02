@@ -203,7 +203,7 @@ function FAQ({ questions, classData }) {
                     variant="outlined"
                     color="primary"
                     type="file"
-                    accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,application/msword"
+                    accept=".png,.jpg,.jpeg,.pdf,.doc"
                   />
                 </label>
               </Fab>

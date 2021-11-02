@@ -3,9 +3,14 @@ import React, { useEffect, useState } from "react";
 import { useLocalContext } from "../Context/context";
 import "../../assets/styles/globalStyles/Styles.css";
 import DeleteIcon from '@mui/icons-material/Delete';
+import Chip from '@mui/material/Chip';
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import LinkIcon from "@mui/icons-material/Link";
+import ImgModal from "../teacher/ImageModal";
+import ImageIcon from "@mui/icons-material/Image";
 const Announcment = ({ classData }) => {
   const [announcments, setAnnouncments] = useState([]);
-  const { db } = useLocalContext();
+  const { db, openImg, setOpenImg, setUrl, url } = useLocalContext();
   useEffect(() => {
     if (classData) {
       let unsubscribe = db
@@ -20,14 +25,14 @@ const Announcment = ({ classData }) => {
   }, [classData]);
   // console.log(announcments);
 
-  const handleDelAnn=(id)=>{
+  const handleDelAnn = (id) => {
     db
-    .collection("announcements")
-    .doc(classData.code)
-    .collection("allAnnouncements")
-    .doc(id)
-    .delete();
-    
+      .collection("announcements")
+      .doc(classData.code)
+      .collection("allAnnouncements")
+      .doc(id)
+      .delete();
+
   }
   return (
     <>
@@ -47,8 +52,8 @@ const Announcment = ({ classData }) => {
         >
 
           <div key={index} className="amt">
-            <div style={{ float: "right", padding: "2%" ,cursor:"pointer" }}>
-              <DeleteIcon onClick={()=>handleDelAnn(item.id)} />
+            <div style={{ float: "right", padding: "2%", cursor: "pointer" }}>
+              <DeleteIcon onClick={() => handleDelAnn(item.id)} />
             </div>
             <div className="amt__Cnt">
               <div className="amt__top">
@@ -58,40 +63,57 @@ const Announcment = ({ classData }) => {
 
               </div>
 
-              <p className="amt__txt">{item.text}</p>
-              {
-                item.imgURL?.map((obj, idx) => (
-                  <embed key={idx} src={obj.URL} style={{ width: "100%" }} >
+              <h2 className="amt__txt">{item.text}</h2>
 
-                  </embed>
+              <div>
+                {item.pdfURL?.map((pdf, idx) => (
 
+                  <Chip color="primary"
+                    onClick={(e) => { setOpenImg(true); setUrl(pdf.URL); }} style={{ margin: "1%" }}
+                    size="small" icon={<PictureAsPdfIcon />}
+                    label={pdf.name.substr(0, 10) + "..."}
 
+                  />
                 ))
-              }
-              {
-                item.docURL?.map((obj, idx) => (
-                  <embed key={idx} src={obj.URL} style={{ width: "40%" }}>
-
-                  </embed>
 
 
+                }
+              </div>
+
+              <div>
+                {item.imgURL?.map((pdf, idx) => (
+
+                  <Chip color="secondary"
+                    onClick={(e) => { setOpenImg(true); setUrl(pdf.URL); }} style={{ margin: "1%" }}
+                    size="small" icon={<ImageIcon />}
+                    label={pdf.name.substr(0, 10)}
+                  />
                 ))
-              }
-              {
-                item.pdfURL?.map((obj, idx) => (
-                  <embed key={idx} src={obj.URL} width="50" height="50">
-
-                  </embed>
 
 
+                }
+              </div>
+              <div>
+                {item.linkURL?.map((URL, idx) => (
+
+                  <a style={{textDecoration:"none"}} href={URL.substr(0, 7) === "http://" ? URL : `http://${URL}`} target="_blank" rel="noreferrer" >
+                    <Chip color="info"
+                      style={{ margin: "1%" ,cursor:"pointer"}}
+                      size="small" icon={<LinkIcon />}
+                      label={URL.substr(0, 10)}
+                    />
+                  </a>
                 ))
-              }
 
+
+                }
+              </div>
 
             </div>
           </div>
         </Box>
       ))}
+      {openImg && <ImgModal url={url} />}
     </>
   );
 };
