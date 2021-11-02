@@ -19,24 +19,14 @@ import Typography from "@mui/material/Typography";
 import AllStudentsTable from "./AllStudentsTable";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-const AllAssignment = ({ classData,modules,Assignments }) => {
+const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
     const { db } = useLocalContext();
-    const [studentsdata,setstudents]= useState([]);
+    const [expanded, setExpanded] = React.useState(false);
 
-    const getStudentsinfo=(id)=>{
-      let unsubscribe = db
-        .collection("CreatedClasses")
-        .doc(classData.ownerMail)
-        .collection("ClassC")
-        .doc(classData.code)
-        .collection("Status")
-        .where("Enrolled_Status", "==", true)
-        .onSnapshot((snap) => {
-          setstudents(snap.docs.map((doc) => doc.data()));
-        });
-
-      
-    }
+    const handleChange = (panel) => (event, isExpanded) => {
+      setExpanded(isExpanded ? panel : false);
+  
+    };
 
     const handleDelAssignment=(module,id)=>{
         db
@@ -44,8 +34,6 @@ const AllAssignment = ({ classData,modules,Assignments }) => {
         .doc(classData.ownerMail)
         .collection("ClassC")
         .doc(classData.code)
-        .collection("Modules")
-        .doc(module)
         .collection("Assignment")
         .doc(id)
         .delete();
@@ -59,9 +47,6 @@ const AllAssignment = ({ classData,modules,Assignments }) => {
         
           <Accordion
           onClick={() => {
-
-            getStudentsinfo(item.id);
-
           }}
           key={index}
           style={{
@@ -72,6 +57,8 @@ const AllAssignment = ({ classData,modules,Assignments }) => {
             border: "1px solid black",
             display: "block",
           }}
+            expanded={expanded === `${item.Modname}`}
+            onChange={handleChange(item.Modname)}
             sx={{
               mt: 1,
               backgroundColor:"White",
@@ -144,8 +131,8 @@ const AllAssignment = ({ classData,modules,Assignments }) => {
 
             </AccordionSummary>
             <AccordionDetails>
-              
               <AllStudentsTable id={item.id} classData={classData} studentsdata={studentsdata}/>
+              {/* <Requiredinfo id={item.id} /> */}
             </AccordionDetails>
           </Accordion>
         

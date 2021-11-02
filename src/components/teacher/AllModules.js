@@ -82,39 +82,53 @@ export default function AllModules({ classData, modules,progress }) {
         Progress:progress,
       },{merge:true})
     
+      let userdata=await db
+      .collection("CreatedClasses")
+      .doc(classData.ownerMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Status")
+      .doc(loggedUserMail)
+      .get()
+      
       let assign=await db
       .collection("CreatedClasses")
       .doc(classData.ownerMail)
       .collection("ClassC")
       .doc(classData.code)
-      .collection("Modules")
-      .doc(`module${idx+1}`)
       .collection("Assignment")
+      .where("Modname", "==", `module${idx+1}`)
       .get()
       console.log(assign)
 
       assign.forEach(async(doc)=>{
         console.log(doc.data())
-        await db.collection("CreatedClasses")
+        let studentref =db.collection("CreatedClasses")
         .doc(classData.ownerMail)
         .collection("ClassC")
         .doc(classData.code)
-        .collection("Status")
-        .doc(loggedUserMail)
         .collection("Assignment")
         .doc(doc.data().id)
-        .set(doc.data());
+        .collection("Submissions")
+        .doc(loggedUserMail);
 
-        await db.collection("CreatedClasses")
-        .doc(classData.ownerMail)
-        .collection("ClassC")
-        .doc(classData.code)
-        .collection("Status")
-        .doc(loggedUserMail)
-        .collection("Assignment")
-        .doc(doc.data().id)
-        .update({Marks:-1,Status:false,UploadedURL:""});
 
+        await studentref.set(
+          {
+            email_id: userdata.data().email_id,
+            name: userdata.data().name,
+            Marks:-1,
+            Status:false,
+            id: doc.data().id,
+            Title: doc.data().Title,
+            Modname: doc.data().Modname,
+            text: doc.data().text,
+            pdfURL: doc.data().pdfURL,
+            imgURL: doc.data().imgURL,
+            docURL: doc.data().docURL
+          },
+          { merge: true }
+        );
       })
 
 

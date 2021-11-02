@@ -22,68 +22,52 @@ import {useRef} from 'react';
 export default function AllStudentsTable({ id,classData,studentsdata}) {
   const { db } = useLocalContext();
   const classes = useStyles();
-  const [names,setnames] = useState([]);
-  const [mails,setmails] = useState([]);
-  const [marks,setmarks] = useState([]);
-  const [status,setstatus] = useState([]);
+  const [csd,setcsd] = useState([]);
+  const [isd,setisd] = useState([]);
+  const [empty_array,setarray] = useState([]);
   const [assignmentmarks,setassignmarks] = useState(0);
-  let btnRef = useRef();
 
-  const onBtnClick = e => {
-    if(btnRef.current){
-      btnRef.current.setAttribute("disabled", "disabled");
-    }
+  useEffect(() => {
+    requiredinfo()
+  }, []);
+
+  const requiredinfo = async ()=> {
+    let completedStudents=[]
+    let incompletedStudents=[]
+    studentsdata.forEach(async(student)=>{
+      const studentAssignmentinfo = await db
+        .collection("CreatedClasses")
+        .doc(classData.ownerMail)
+        .collection("ClassC")
+        .doc(classData.code)
+        .collection("Assignment")
+        .doc(id)
+        .collection("Submissions")
+        .doc(student.email_id)
+        .get()
+
+        if(studentAssignmentinfo.exists){
+          completedStudents.push(studentAssignmentinfo.data())
+        }
+        else{
+          const notreachedstudent = await db
+            .collection("CreatedClasses")
+            .doc(classData.ownerMail)
+            .collection("ClassC")
+            .doc(classData.code)
+            .collection("Status")
+            .doc(student.email_id)
+            .get()
+
+            incompletedStudents.push(notreachedstudent.data())
+        }
+        setcsd(completedStudents)
+        setisd(incompletedStudents)
+        
+      })
   }
 
-  const requiredinfo= () => {
-    console.log("Class is",id)
-    if (classData) {
-        studentsdata.forEach(async(student)=>{
-            let Students=names
-            let mail_id=mails
-            Students.push(student.name) 
-            mail_id.push(student.email_id)
-            setnames(Students)
-            setmails(mail_id)
-            let stat=status
-            let mks=marks
-            const studentAssignmentinfo = await db
-              .collection("CreatedClasses")
-              .doc(classData.ownerMail)
-              .collection("ClassC")
-              .doc(classData.code)
-              .collection("Status")
-              .doc(student.email_id)
-              .collection("Assignment")
-              .doc(id)
-              .get()
-
-              if(studentAssignmentinfo.exists){
-                  if(studentAssignmentinfo.data().Status == true){
-                      stat.push(studentAssignmentinfo.data().UploadedURL)
-                      mks.push(studentAssignmentinfo.data().Marks)
-                  }else{
-                      stat.push("Not Completed Yet")
-                      mks.push("--")
-                  }
-                  
-              }
-              else{
-                  stat.push("Not Reached")
-                  mks.push("--")
-              }
-              setstatus(stat)
-              setmarks(mks)
-              
-            })
-            console.log(names)
-            console.log(status)
-            console.log(marks)
-                  
-    }
-  };
-
-  const handleaddmarks = async (e,index) => {
+  const handleaddmarks = async (e,mail_id) => {
   
 
     try {
@@ -92,15 +76,16 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
         .doc(classData.ownerMail)
         .collection("ClassC")
         .doc(classData.code)
-        .collection("Status")
-        .doc(mails[index])
         .collection("Assignment")
         .doc(id)
+        .collection("Submissions")
+        .doc(mail_id)
         .set({
           Marks:assignmentmarks,
         },
         { merge: true });
-  
+    
+        requiredinfo()
         
 
     } catch (e) {
@@ -110,14 +95,6 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
 
   return (
     <>
-      <Button
-            variant="contained"
-            color="primary"
-            size="medium"
-            ref={btnRef} 
-            onClick={(e)=>{onBtnClick(e);requiredinfo()}}>
-              Get Data
-      </Button>
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
           <TableHead >
@@ -128,17 +105,17 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
             </TableRow>
           </TableHead>
           <TableBody>
-          {status.map((stat,index)=>(
-            marks[index]==="--"?  
+          {csd.map((student,index)=>(
+            student.Status==false?  
             <TableRow >
-            <TableCell>{names[index]}</TableCell>
-            <TableCell>{stat}</TableCell>
-            <TableCell>{marks[index]}</TableCell>
+            <TableCell>{student.name}</TableCell>
+            <TableCell align="center">Not Completed</TableCell>
+            <TableCell align="center">--</TableCell>
             </TableRow>
-            :marks[index]=="-1"?
+            :student.Marks=="-1"?
             <TableRow >
-            <TableCell>{names[index]}</TableCell>
-            <TableCell align="center"><a href={stat} target="_blank" rel="noreferrer"><PictureAsPdfIcon /></a></TableCell>
+            <TableCell>{student.name}</TableCell>
+            <TableCell align="center"><a href={student.UploadedURL[0].URL} target="_blank" rel="noreferrer"><PictureAsPdfIcon /></a></TableCell>
             <TableCell><TextField
               label="Marks"
               type="number"
@@ -154,7 +131,7 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
             color="primary"
             size="medium"
             onClick={(e) => {
-              handleaddmarks(e,index);
+              handleaddmarks(e,student.email_id);
             }}
           >
             Add
@@ -162,10 +139,18 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
             </TableRow>
           :
           <TableRow >
-          <TableCell>{names[index]}</TableCell>
-          <TableCell align="center"><a href={stat} target="_blank" rel="noreferrer"><PictureAsPdfIcon /></a></TableCell>
-          <TableCell>{marks[index]}</TableCell>
+          <TableCell>{student.name}</TableCell>
+          <TableCell align="center"><a href={student.UploadedURL[0].URL} target="_blank" rel="noreferrer"><PictureAsPdfIcon /></a></TableCell>
+          <TableCell align="center">{student.Marks}</TableCell>
           </TableRow>
+            
+            ))}
+          {isd.map((student,index)=>(
+            <TableRow >
+            <TableCell>{student.name}</TableCell>
+            <TableCell align="center">Not Reached</TableCell>
+            <TableCell align="center">--</TableCell>
+            </TableRow>
             
             ))}
           </TableBody>

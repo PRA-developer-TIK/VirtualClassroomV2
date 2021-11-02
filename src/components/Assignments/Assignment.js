@@ -15,7 +15,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-function Assignment({ classData ,modules,Assignments}) {
+function Assignment({ classData ,modules,Assignments,studentsdata}) {
     const { storage, db, loggedUserMail, loggedUser } = useLocalContext();
 
     const [inputValue, setInputValue] = useState("");
@@ -38,8 +38,6 @@ function Assignment({ classData ,modules,Assignments}) {
             .doc(classData.ownerMail)
             .collection("ClassC")
             .doc(classData.code)
-            .collection("Modules")
-            .doc(module)
             .collection("Assignment")
             .doc(id);
 
@@ -236,7 +234,7 @@ function Assignment({ classData ,modules,Assignments}) {
                 
             </Box>)
             }
-            <AllAssignment classData={classData} modules={modules} Assignments={Assignments}/>
+            <AllAssignment classData={classData} modules={modules} Assignments={Assignments} studentsdata={studentsdata}/>
             
         </Container >
     );
