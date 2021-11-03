@@ -10,7 +10,7 @@ import {useLocalContext} from "../Context/context"
 
 export default function ImgModal({url}) {
   const [open, setOpen] = React.useState(false);
-  const  {setOpenImg,openImg}=useLocalContext();
+  const  {setOpenImg,openImg,openFileType}=useLocalContext();
 
   const handleClickOpen = () => {
     setOpenImg(true);
@@ -35,13 +35,22 @@ export default function ImgModal({url}) {
               m: "auto"
             }}
           >
-<embed  src={url} width="500" height="800" ></embed>         
+            {/* <embed src={`http://docs.google.com/gview?url=${url}&embedded=true`}></embed> */}
+
+{openFileType?
+<>
+<h1>No preview Plzz Download!!!</h1>
+<embed  src={url} width="100" height="100" ></embed>
+</>
+
+  :
+<embed  src={url} width="500" height="800" ></embed>      }   
  </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Close</Button>
+          <Button variant="contained" color="secondary" onClick={handleClose}>Close</Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>
   );
-}
+} 

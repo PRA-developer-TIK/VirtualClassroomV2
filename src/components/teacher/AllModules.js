@@ -24,7 +24,7 @@ export default function AllModules({ classData, modules,progress }) {
   
 
 
-  const { loggedUserMail, db, openImg, setOpenImg,url } = useLocalContext();
+  const { loggedUserMail, db, openImg, setOpenImg,url,openFileType } = useLocalContext();
 
   //open closing accordion
   const [open, setOpen] = React.useState(false);
@@ -235,7 +235,7 @@ export default function AllModules({ classData, modules,progress }) {
         // </div>
         
       ))}
-      {openImg && <ImgModal url={url} />}
+      {openImg && <ImgModal url={url}  />}
     </>
   );
 }

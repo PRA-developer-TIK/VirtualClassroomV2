@@ -181,6 +181,9 @@ function Announcement({ classData }) {
             <button size="small" 
               onClick={(e) => {
                 handleUpload(e);
+                setInputValue("");
+                setInputLinks([]);
+                setFiles([]);
               }}
               className={classes.postBtn}
               
