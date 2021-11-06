@@ -41,6 +41,14 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
             .collection("Assignment")
             .doc(id);
 
+        let new_collection=db.collection("CreatedClasses")
+            .doc(classData.ownerMail)
+            .collection("ClassC")
+            .doc(classData.code)
+            .collection("Assignment")
+            .doc(id)
+            .collection("Submissions")
+
         if (files.length > 0 && inputValue) {
             files.forEach(async (file, idx) => {
                 console.log(file.name, idx);

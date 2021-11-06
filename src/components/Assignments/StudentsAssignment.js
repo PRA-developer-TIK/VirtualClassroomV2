@@ -14,6 +14,8 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
     
       setFiles(Object.keys(e.target.files).map(key=>(e.target.files[key])));
     };
+    console.log(StudentsAss)
+
 
     const handleUpload = async (e,id) => {
     

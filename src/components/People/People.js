@@ -13,6 +13,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
+import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useLocalContext } from "../Context/context";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -23,53 +24,131 @@ import {
 } from "@mui/material";
 
 
-export default function People({ classData ,rows }) {
+export default function People({ classData , Assignments}) {
   const { db, loggedUserMail} = useLocalContext();
   const [email, setEmail] = useState("");
   const [searchmail, setMail] = useState("");
-  const [rowsintable, settablerows] = useState(rows);
   const [error, setError] = useState(false);
   const [errortxt, setErrortxt] = useState("");
   const [errortoadd, setErrortoadd] = useState(false);
   const [errortxttoadd, setErrortxttoadd] = useState("");
+  const [rows,setRows] = useState([]);
+
+  useEffect(() => {
+    getdata()
+    
+  }, []);
+
+  const getdata = async ()=> {
+    try {
+      let unsubscribe = await db
+        .collection("CreatedClasses")
+        .doc(classData.ownerMail)
+        .collection("ClassC")
+        .doc(classData.code)
+        .collection("Status").orderBy('Enrolled_Status','desc').onSnapshot((snap) => {
+          setRows(snap.docs.map((doc) => doc.data()));
+        });
+      
+    }catch (e) {
+      console.log(e);
+    }
+  }
+
+
+  const handleDelstudent = async (mail_id) => {
+
+    await db
+      .collection("CreatedClasses")
+      .doc(classData.ownerMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Status")
+      .doc(mail_id)
+      .delete()
+    
+    await db
+      .collection("joinedClasses")
+      .doc(mail_id)
+      .collection("classesJ")
+      .doc(classData.code)
+      .delete()
+
+    Assignments.forEach(async(doc)=>{
+        try {
+          await db
+            .collection("CreatedClasses")
+            .doc(classData.ownerMail)
+            .collection("ClassC")
+            .doc(classData.code)
+            .collection("Assignment")
+            .doc(doc.id)
+            .collection("Submissions")
+            .doc(mail_id)
+            .delete()
+  
+            
+        }catch (e) {
+          console.log(e);
+      }
+    });
+
+  }
 
   const addstudent = async(e) => {
-    if (validator.isEmail(email)) {
-      try {
-        const no_module_snap = await db
-          .collection("CreatedClasses")
-          .doc(classData.ownerMail)
-          .collection("ClassC")
-          .doc(classData.code)
-          .collection("modules")
-          .get()
-        
-        var prog_array = []
-        let count = parseInt(no_module_snap.size)
-        count == 0? prog_array = []: count == 1? prog_array=[0]:prog_array = Array(count).fill(0)
-        await db
-          .collection("CreatedClasses")
-          .doc(loggedUserMail)
-          .collection("ClassC")
-          .doc(classData.code)
-          .collection("Status")
-          .doc(email)
-          .set({
-            email_id: email,
-            name: "",
-            Enrolled_Status: false,
-            Progress: prog_array,
-          });
-  
-      }catch (e) {
-        console.log(e);
+    let check_student = await db
+      .collection("CreatedClasses")
+      .doc(loggedUserMail)
+      .collection("ClassC")
+      .doc(classData.code)
+      .collection("Status")
+      .doc(email)
+      .get()
+
+      if (!check_student.exists){
+        if (validator.isEmail(email)) {
+        try {
+          const no_module_snap = await db
+            .collection("CreatedClasses")
+            .doc(classData.ownerMail)
+            .collection("ClassC")
+            .doc(classData.code)
+            .collection("Modules")
+            .get()
+          
+          var prog_array = []
+          let count = parseInt(no_module_snap.size)
+          count === 0? prog_array = []: prog_array = Array(count).fill(0)
+          await db
+            .collection("CreatedClasses")
+            .doc(loggedUserMail)
+            .collection("ClassC")
+            .doc(classData.code)
+            .collection("Status")
+            .doc(email)
+            .set({
+              email_id: email,
+              name: "",
+              Enrolled_Status: false,
+              Progress: prog_array,
+            });
+
+          getdata()
+    
+        }catch (e) {
+          console.log(e);
+        }
+        setErrortoadd(false);
+        setErrortxttoadd("");
+      } else {
+        setErrortoadd(true);
+        setErrortxttoadd("Enter a Valid Email");
+        return;
       }
     } else {
       setErrortoadd(true);
-      setErrortxttoadd("Enter a Valid Email");
-      return;
+      setErrortxttoadd("Student Already Exists");
     }
-
     
   }
   const searchstudent = async(e) =>{
@@ -85,7 +164,7 @@ export default function People({ classData ,rows }) {
         .get()
         let temp_array=[student_doc.data()]
         if (student_doc.exists) {
-          settablerows(temp_array);
+          setRows(temp_array);
         }else {
           setError(true);
           setErrortxt("No Such Student in the class");
@@ -99,7 +178,7 @@ export default function People({ classData ,rows }) {
       }
     }
     else {
-      settablerows(rows);
+      setRows(rows);
     }
   }
 
@@ -162,6 +241,12 @@ export default function People({ classData ,rows }) {
               </TableCell>
               <TableCell align="center">{row.email_id}</TableCell>
               <TableCell align="center">{giveprogress(row.Enrolled_Status,row.Progress)}</TableCell>
+              <TableCell align="center">< DeleteIcon onClick={() => {
+                  // setDeleteDialog(true);
+
+                  handleDelstudent(row.email_id);
+                }}
+                  style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>
             </TableRow>
             <TableRow>
               <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -230,7 +315,7 @@ export default function People({ classData ,rows }) {
                   required={false}
                 />
             <Button
-                onClick={(e) => {setEmail("");addstudent(e)}}
+                onClick={(e) => {addstudent(e)}}
                 style={{ margin: "1%" }}
                 variant="outlined"
               >
@@ -267,10 +352,11 @@ export default function People({ classData ,rows }) {
                         <TableCell align="center"><h2>Name</h2></TableCell>
                         <TableCell align="center"><h2>Email</h2></TableCell>
                         <TableCell align="center"><h2>Progress</h2></TableCell>
+                        <TableCell align="center"></TableCell>
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {rowsintable.map((row) => (
+                    {rows.map((row) => (
                       <Row key={row.email_id} row={row} />
                     ))}
                     </TableBody>
