@@ -6,6 +6,7 @@ import { useLocalContext } from "../Context/context";
 import useStyles from "../../assets/styles/globalStyles/styles";
 import firebase from "@firebase/app-compat";
 import { v4 as uuidv4 } from "uuid";
+import validator from 'validator';
 
 function CreateClass() {
   //global imports states
@@ -24,6 +25,7 @@ function CreateClass() {
   const [domain, setDomain] = useState("");
   const [mails, setmails] = useState("");
   const [mailarray, setmailarray] = useState([]);
+  const [invalidmails, setinvalidmails] = useState([]);
   const [mailcount, setmailcount] = useState(0);
   const [noofmods, setmodcount] = useState(0);
 
@@ -50,6 +52,7 @@ function CreateClass() {
     e.preventDefault();
     console.log("id is ", uuidv4());
     console.log("timestamp");
+    setmailcount(0)
     const id = uuidv4();
 
     try {
@@ -83,26 +86,31 @@ function CreateClass() {
           });
         }
       
+      let temp_invalidmails = []
       for (let i=0;i<mailarray.length;i++){
           let current_mail=mailarray[i]
-          console.log(noofmods) 
-          console.log(typeof(noofmods)) 
           let prog_array = Array(noofmods).fill(0)
-          console.log(prog_array)
-          const mail_list = await db
-          .collection("CreatedClasses")
-          .doc(loggedUserMail)
-          .collection("ClassC")
-          .doc(id)
-          .collection("Status")
-          .doc(current_mail)
-          .set({
-            email_id: current_mail,
-            name: "",
-            Enrolled_Status: false,
-            Progress: prog_array,
-          });
+           if(validator.isEmail(current_mail)) {
+              const mail_list = await db
+                .collection("CreatedClasses")
+                .doc(loggedUserMail)
+                .collection("ClassC")
+                .doc(id)
+                .collection("Status")
+                .doc(current_mail)
+                .set({
+                  email_id: current_mail,
+                  name: "",
+                  Enrolled_Status: false,
+                  Progress: prog_array,
+                });
+            } else {
+              temp_invalidmails.push(current_mail)
+            }
+            
       }
+      console.log(temp_invalidmails)
+      setinvalidmails(temp_invalidmails)
         
       setCreateClassDialog(false);
       console.log("class added", addClass);

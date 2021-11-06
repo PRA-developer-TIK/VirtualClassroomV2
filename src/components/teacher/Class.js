@@ -64,7 +64,7 @@ function Class({ classData }) {
   }, [classData,loggedUserMail]);
 
   //getting people data
-  useEffect(() => {
+  /* useEffect(() => {
     try {
       let unsubscribe = db
         .collection("CreatedClasses")
@@ -78,7 +78,7 @@ function Class({ classData }) {
     }catch (e) {
       console.log(e);
   }
-  }, [classData]);
+  }, [classData]); */
 
   //getting progress details
   useEffect(async() => {
@@ -151,29 +151,6 @@ function Class({ classData }) {
     
   }, [classData]);
 
-  //get students assignments
-  useEffect(async() => {
-    if(classData.ownerMail!==loggedUserMail){
-      try {
-        let assignment =await db
-          .collection("CreatedClasses")
-          .doc(classData.ownerMail)
-          .collection("ClassC")
-          .doc(classData.code)
-          .collection("Status")
-          .doc(loggedUserMail)
-          .collection("Assignment")
-          .onSnapshot((snap) => {
-            setStudentsAss(snap.docs.map((doc) => doc.data()))
-          });
-
-          
-      }catch (e) {
-        console.log(e);
-    }
-    }
-    
-  }, [classData]);
   
   //getting people data for assignment
   useEffect(() => {
@@ -233,7 +210,7 @@ function Class({ classData }) {
         ) :value === "FAQs" ? (
           <FAQ questions={questions} classData={classData} />
         ) : value === "people" ? (
-          <People classData={classData} rows={rows}/>
+          <People classData={classData} Assignments={Assignments}/>
         ) : null}
       </Container>
     </>
