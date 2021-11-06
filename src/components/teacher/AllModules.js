@@ -11,7 +11,8 @@ import SubModTable from "./SubModTable";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import { SettingsInputHdmiRounded } from "@material-ui/icons";
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+
 
 export default function AllModules({ classData, modules,progress }) {
   const classes = useStyles();

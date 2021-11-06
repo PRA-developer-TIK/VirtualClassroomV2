@@ -81,12 +81,12 @@ const Announcment = ({ classData }) => {
               </div>
 
               <div>
-                {item.imgURL?.map((pdf, idx) => (
+                {item.imgURL?.map((img, idx) => (
 
                   <Chip color="secondary"
-                    onClick={(e) => { setOpenImg(true); setUrl(pdf.URL); }} style={{ margin: "1%" }}
+                    onClick={(e) => { setOpenImg(true); setUrl(img.URL); }} style={{ margin: "1%" }}
                     size="small" icon={<ImageIcon />}
-                    label={pdf.name.substr(0, 10)}
+                    label={img.name.substr(0, 10)}
                   />
                 ))
 

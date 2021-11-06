@@ -10,7 +10,7 @@ import {useLocalContext} from "../Context/context"
 
 export default function ImgModal({url}) {
   const [open, setOpen] = React.useState(false);
-  const  {setOpenImg,openImg,openFileType}=useLocalContext();
+  const  {setOpenImg,openImg,openFileType,setOpenFileType}=useLocalContext();
 
   const handleClickOpen = () => {
     setOpenImg(true);
@@ -18,6 +18,7 @@ export default function ImgModal({url}) {
 
   const handleClose = () => {
     setOpenImg(false);
+    setOpenFileType("");
   };
 
   return (
