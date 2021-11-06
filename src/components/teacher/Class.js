@@ -209,13 +209,6 @@ function Class({ classData }) {
           <Tab value="classwork" label="task" />
           <Tab value="FAQs" label="FAQs" />
           <Tab value="people" label="People" />
-        {/* <Button variant="outlined" onClick={(e)=>handleChange(e,"module")} sx={{m:1,border: "2px solid #bd37b6",}}>Modules</Button>
-        <Button variant="outlined" onClick={(e)=>handleChange(e,"announce")} sx={{m:1}}>Announcements</Button>
-        <Button variant="outlined" onClick={(e)=>handleChange(e,"classwork")} sx={{m:1}}>task</Button>
-        <Button variant="outlined" onClick={(e)=>handleChange(e,"FAQs")} sx={{m:1}}>Discuss</Button>
-        <Button variant="outlined" onClick={(e)=>handleChange(e,"people")} sx={{m:1}}>People</Button>
-         */}
-
         </Tabs>
         
 
