@@ -20,7 +20,6 @@ function Class({ classData }) {
   const [rows,setRows]=useState([]);
   const [progress,setProgress]= useState([]);
   const [Assignments, setAssignments] = useState([]);
-  const [StudentsAss, setStudentsAss] = useState([]);
   const [studentsdata,setstudents]= useState([]);
 
 
@@ -112,35 +111,7 @@ function Class({ classData }) {
             .doc(classData.code)
             .collection("Assignment")
             .onSnapshot((snap) => {
-              let temp_assigns=snap.docs.map((doc) => doc.data())
-              setAssignments(snap.docs.map((doc) => doc.data()))
-              
-              temp_assigns.forEach(async(doc)=>{
-                  if(loggedUserMail!=classData.ownerMail){
-                    try {
-                      let assignment = await db
-                        .collection("CreatedClasses")
-                        .doc(classData.ownerMail)
-                        .collection("ClassC")
-                        .doc(classData.code)
-                        .collection("Assignment")
-                        .doc(doc.id)
-                        .collection("Submissions")
-                        .doc(loggedUserMail)
-                        .get()
-
-                        if(assignment.exists){
-                          let temp_students_assign=StudentsAss
-                          temp_students_assign.push(assignment.data())
-                          setStudentsAss(temp_students_assign)
-                        }
-              
-                        
-                    }catch (e) {
-                      console.log(e);
-                  }
-                }
-              });
+              setAssignments(snap.docs.map((doc) => doc.data()))            
             });
 
           
@@ -199,7 +170,7 @@ function Class({ classData }) {
         ) : value === "classwork" && loggedUserMail === classData.ownerMail ? (
           <Assignment classData={classData} modules={modules} Assignments={Assignments} studentsdata={studentsdata}/>
         ) :value === "classwork" && loggedUserMail !== classData.ownerMail ? (
-          <Asstabforstudnets classData={classData} StudentsAss={StudentsAss}/>
+          <Asstabforstudnets classData={classData} Assignments={Assignments}/>
         ) :value === "FAQs" ? (
           <FAQ questions={questions} classData={classData} />
         ) : value === "people" ? (

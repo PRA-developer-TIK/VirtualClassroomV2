@@ -7,9 +7,63 @@ import useStyles from "../../assets/styles/globalStyles/styles.js";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 
-const Asstabforstudnets = ({ classData,StudentsAss }) => {
+
+
+const Asstabforstudnets = ({ classData,Assignments }) => {
     const { storage,loggedUserMail,db ,loggedUser} = useLocalContext();
+    const [StudentsAss, setStudentsAss] = useState([]);
     const [files, setFiles] = useState([]);
+
+
+    useEffect(() => {
+      getallassignments()
+    }, []);
+
+
+    const getallassignments = async ()=> {
+      let temp_students_assign=[]
+      Assignments.forEach(async(doc)=>{
+        if(loggedUserMail!=classData.ownerMail){
+          try {
+            let assignment = await db
+              .collection("CreatedClasses")
+              .doc(classData.ownerMail)
+              .collection("ClassC")
+              .doc(classData.code)
+              .collection("Assignment")
+              .doc(doc.id)
+              .collection("Submissions")
+              .doc(loggedUserMail)
+              .get()
+      
+              if(assignment.exists){
+                if(assignment.data().Status == false && assignment.data().onTime == true){
+                  let today = new Date();
+                  let todaydate = String(today.getDate()).padStart(2, '0');
+                  let todaymonth =  String(today.getMonth() + 1).padStart(2, '0');
+                  let duedate = assignment.data().DeadLine;
+                  let day = duedate.split("/");
+                  if(parseInt(todaydate)>parseInt(day[0]) || parseInt(todaymonth)>parseInt(day[1])){
+                    assignment.set(
+                      {
+                        onTime: false,
+                      },
+                      { merge: true }
+                    );
+                  }
+                }
+                temp_students_assign.push(assignment.data())
+              }
+      
+              
+          }catch (e) {
+            console.log(e);
+        }
+      }
+      });
+      setStudentsAss(temp_students_assign)
+    }
+    
     const handleChange = (e) => {
     
       setFiles(Object.keys(e.target.files).map(key=>(e.target.files[key])));
@@ -78,6 +132,8 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
       } else {
         alert("input value needed")
       }
+
+      getallassignments()
   
     };
     const classes = useStyles();
@@ -147,6 +203,7 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
           </label>
 
           <div style={{ float: "right" }}>
+            {item.Status==false ?
             <button
               onClick={(e) => {
                 handleUpload(e,item.id);
@@ -156,6 +213,16 @@ const Asstabforstudnets = ({ classData,StudentsAss }) => {
               {" "}
               Submit
             </button>
+            :
+            <button
+              onClick={(e) => {
+                handleUpload(e,item.id);
+              }}
+              className={classes.postBtn}
+            >
+              {" "}
+              Resubmit
+            </button>}
           </div>
         </div>
           </div>

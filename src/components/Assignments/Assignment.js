@@ -30,10 +30,63 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
     const handleChangeModule = (event) => {
         setModule(event.target.value);
       };
+
+    const addtostudent = async (modnum, id) => {
+        let modData = await db
+            .collection("CreatedClasses")
+            .doc(classData.ownerMail)
+            .collection("ClassC")
+            .doc(classData.code)
+            .collection("Assignment")
+            .doc(id)
+            .get();
+
+        studentsdata.forEach(async(doc)=>{
+            let progarray = doc.Progress
+            if (progarray[modnum-1]===1){
+                var deadby = new Date();
+                var dd = String(deadby.getDate() + parseInt(3)).padStart(2, '0');
+                var mm = String(deadby.getMonth() + 1).padStart(2, '0'); //January is 0!
+                var yyyy = deadby.getFullYear();
+
+                deadby = dd + '/' + mm + '/' + yyyy;
+
+                let studentref =db.collection("CreatedClasses")
+                .doc(classData.ownerMail)
+                .collection("ClassC")
+                .doc(classData.code)
+                .collection("Assignment")
+                .doc(modData.data().id)
+                .collection("Submissions")
+                .doc(doc.email_id);
+
+
+                await studentref.set(
+                {
+                    email_id: doc.email_id,
+                    name: doc.name,
+                    Marks: -1,
+                    Status: false,
+                    DeadLine: deadby,
+                    onTime: true,
+                    id: modData.data().id,
+                    Title: modData.data().Title,
+                    Modname: modData.data().Modname,
+                    text: modData.data().text,
+                    pdfURL: modData.data().pdfURL,
+                    imgURL: modData.data().imgURL,
+                    docURL: modData.data().docURL
+                },
+                { merge: true }
+                );
+            }
+        });
+        
+    }
     const handleUpload = async (e) => {
 
         let id = uuidv4();
-        let dbRef = db
+        let dbRef = await db
             .collection("CreatedClasses")
             .doc(classData.ownerMail)
             .collection("ClassC")
@@ -41,7 +94,8 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
             .collection("Assignment")
             .doc(id);
 
-        let new_collection=db.collection("CreatedClasses")
+        let new_collection= await db
+            .collection("CreatedClasses")
             .doc(classData.ownerMail)
             .collection("ClassC")
             .doc(classData.code)
@@ -161,6 +215,8 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
         } else {
             alert("input value needed")
         }
+        let lastChar = module.substr(module.length - 1)
+        addtostudent(parseInt(lastChar),id)
 
     };
     const classes = useStyles();

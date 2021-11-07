@@ -103,7 +103,13 @@ export default function AllModules({ classData, modules,progress }) {
       console.log(assign)
 
       assign.forEach(async(doc)=>{
-        console.log(doc.data())
+        var deadby = new Date();
+        var dd = String(deadby.getDate() + parseInt(doc.data().maxDays)).padStart(2, '0');
+        var mm = String(deadby.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = deadby.getFullYear();
+
+        deadby = dd + '/' + mm + '/' + yyyy;
+
         let studentref =db.collection("CreatedClasses")
         .doc(classData.ownerMail)
         .collection("ClassC")
@@ -118,8 +124,10 @@ export default function AllModules({ classData, modules,progress }) {
           {
             email_id: userdata.data().email_id,
             name: userdata.data().name,
-            Marks:-1,
-            Status:false,
+            Marks: -1,
+            Status: false,
+            DeadLine: deadby,
+            onTime: true,
             id: doc.data().id,
             Title: doc.data().Title,
             Modname: doc.data().Modname,
