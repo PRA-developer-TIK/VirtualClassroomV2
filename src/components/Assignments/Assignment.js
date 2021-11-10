@@ -56,7 +56,7 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
                     .collection("ClassC")
                     .doc(classData.code)
                     .collection("Assignment")
-                    .doc(modData.data().id)
+                    .doc(id)
                     .collection("Submissions")
                     .doc(doc.email_id);
 
@@ -141,6 +141,8 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
                                         timestamp: firebase.firestore.Timestamp.now(),
                                         text: inputValue,
                                         pdfURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                                        docURL: [],
+                                        imgURL: [],
                                     },
                                     { merge: true }
                                 );
@@ -151,6 +153,8 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
                                         timestamp: firebase.firestore.Timestamp.now(),
                                         text: inputValue,
                                         imgURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                                        pdfURL: [],
+                                        docURL: [],
                                     },
                                     { merge: true }
                                 );
@@ -161,6 +165,8 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
                                         timestamp: firebase.firestore.Timestamp.now(),
                                         text: inputValue,
                                         docURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                                        pdfURL: [],
+                                        imgURL: [],
                                     },
                                     { merge: true }
                                 );
