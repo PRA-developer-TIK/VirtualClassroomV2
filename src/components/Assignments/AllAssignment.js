@@ -13,7 +13,10 @@ import Chip from '@mui/material/Chip';
 import ImgModal from "../teacher/ImageModal";
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import ImageIcon from "@mui/icons-material/Image";
-import StatusList from "./AssignmentStatus";
+
+import StudentStatus from "./StudentStatus";
+
+
 const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
     const { db,openImg,setOpenImg,setOpenFileType } = useLocalContext();
     const [url,setUrl]=useState("");
@@ -45,55 +48,12 @@ const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
         container
         spacing={1}
         direction="row"
-        justifyContent="space-evenly"
+        justifyContent="center"
         alignItems="center"
       > 
       {Assignments.map((item, index) => (
-        
-        //   <Accordion
-        //   onClick={() => {
-        //   }}
-        //   key={index}
-        //   style={{
-            
-        //     width: "80%",
-        //     margin: "auto",
-        //     marginTop: "2%",
-        //     border: "1px solid black",
-        //     display: "block",
-        //   }}
-        //     expanded={expanded === `${item.Modname}`}
-        //     onChange={handleChange(item.Modname)}
-        //     sx={{
-        //       mt: 1,
-        //       backgroundColor:"White",
-        //       color:"black"
-        //     }}
-        //   >
-        //     <AccordionSummary
-        //       expandIcon={<ExpandMoreIcon style={{color:"black"}} />}
-        //       aria-controls="panel1a-content"
-        //       id="panel1a-header"
-        //     >
-        //       <Typography sx={{ width: "50%", flexShrink: 0 }}>
-        //       <Box
-        //   key={index}
-        //   sx={{
-        //     width: "80%",
-        //     border: "1px solid black",
-        //     padding: "2%",
-        //     borderRadius: 10,
-        //     m: "auto",
-        //     mt: 1,
-
-        //   }}
-        //   boxShadow={6}
-        // >
-        
         <Card sx={{ margin:"2%",width:"35%",backgroundColor:"#fefefe",padding:2}}  key={index}>
 
-          {!status ?
-          <>
            <div style={{ float: "right", padding: "2%" ,cursor:"pointer" }}>
            <DeleteIcon sx={{color:"#d11a2a"}} onClick={()=>handleDelAssignment(item.Modname,item.id)} />
          </div>
@@ -141,19 +101,6 @@ const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
 
          </div>
          <Button key={index} onClick={()=>{console.log("btn id",index);showStatus(true)}} variant="contained" color="success" size="small" sx={{float:"right"}}>Status</Button>
-         </>
-
-         :
-         <>
-         <StatusList/>
-         <Button key={index} onClick={()=>showStatus(false)} variant="contained" color="error" size="small" sx={{float:"right"}}>back</Button>
-         </>
-
-          }
-          
-           
-            
-          
           </Card>
           // </Box>
 
@@ -167,6 +114,7 @@ const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
           // </Accordion>
         
       ))}
+      <StudentStatus openStatus={status}/>
       {openImg && <ImgModal url={url} />}
       </Grid>
   
