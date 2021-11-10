@@ -22,8 +22,9 @@ const Asstabforstudnets = ({ classData,Assignments }) => {
 
     const getallassignments = async ()=> {
       let temp_students_assign=[]
-      Assignments.forEach(async(doc)=>{
-        if(loggedUserMail!=classData.ownerMail){
+
+      var bar = new Promise((resolve, reject) => {
+        Assignments.forEach(async(doc,index)=>{
           try {
             let assignment = await db
               .collection("CreatedClasses")
@@ -35,8 +36,10 @@ const Asstabforstudnets = ({ classData,Assignments }) => {
               .collection("Submissions")
               .doc(loggedUserMail)
               .get()
-      
+
+              console.log("aat alo")
               if(assignment.exists){
+                console.log("ajun aat alo")
                 if(assignment.data().Status == false && assignment.data().onTime == true){
                   let today = new Date();
                   let todaydate = String(today.getDate()).padStart(2, '0');
@@ -59,9 +62,15 @@ const Asstabforstudnets = ({ classData,Assignments }) => {
           }catch (e) {
             console.log(e);
         }
-      }
+        if (index === Assignments.length-1){
+          resolve()
+        }
       });
-      setStudentsAss(temp_students_assign)
+    });
+    
+    bar.then(() => {
+        setStudentsAss(temp_students_assign)
+    });
     }
     
     const handleChange = (e) => {

@@ -15,15 +15,16 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import ImageIcon from "@mui/icons-material/Image";
 
 import StudentStatus from "./StudentStatus";
+import AllStudentsTable from "./AllStudentsTable";
 
 
 const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
-    const { db,openImg,setOpenImg,setOpenFileType } = useLocalContext();
+    const { db,openImg,setOpenImg,setOpenFileType,setShowStudentStatus } = useLocalContext();
     const [url,setUrl]=useState("");
     const [expanded, setExpanded] = React.useState(false);
+    const [assmtId,setAssmtId]=useState(0);
 
-    const [status,showStatus]=useState(false);
-
+    
     const handleChange = (panel) => (event, isExpanded) => {
       setExpanded(isExpanded ? panel : false);
   
@@ -43,7 +44,7 @@ const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
 
       
     return (
-        
+    <>
     <Grid
         container
         spacing={1}
@@ -52,6 +53,7 @@ const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
         alignItems="center"
       > 
       {Assignments.map((item, index) => (
+        <>
         <Card sx={{ margin:"2%",width:"35%",backgroundColor:"#fefefe",padding:2}}  key={index}>
 
            <div style={{ float: "right", padding: "2%" ,cursor:"pointer" }}>
@@ -100,25 +102,34 @@ const AllAssignment = ({ classData,modules,Assignments,studentsdata }) => {
 
 
          </div>
-         <Button key={index} onClick={()=>{console.log("btn id",index);showStatus(true)}} variant="contained" color="success" size="small" sx={{float:"right"}}>Status</Button>
-          </Card>
+         <Button key={index} onClick={()=>{setShowStudentStatus(true);setAssmtId(item.id)}} variant="contained" color="success" size="small" sx={{float:"right"}}>Status</Button>
+         
+        </Card>
+
+        </>
+
+          
           // </Box>
 
           //     </Typography>
 
           //   </AccordionSummary>
           //   <AccordionDetails>
-          //     <AllStudentsTable id={item.id} classData={classData} studentsdata={studentsdata}/>
+          //     
           //     {/* <Requiredinfo id={item.id} /> */}
           //   </AccordionDetails>
           // </Accordion>
         
       ))}
-      <StudentStatus openStatus={status}/>
+      {/* <StudentStatus openStatus={status}/> */}
       {openImg && <ImgModal url={url} />}
       </Grid>
+
+      {assmtId && <AllStudentsTable id={assmtId} classData={classData} studentsdata={studentsdata}  />}
+      {/* <AllStudentsTable id={item.id} classData={classData} studentsdata={studentsdata}  /> */}
+      </>
   
     )
 }
 
-export default AllAssignment
+export default AllAssignment;

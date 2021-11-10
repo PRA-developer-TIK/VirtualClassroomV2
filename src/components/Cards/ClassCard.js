@@ -10,9 +10,11 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import {Link,useHistory} from "react-router-dom"
+import { useLocalContext } from "../Context/context";
 
 export default function ClassCard({classData}) {
   let date = new Date().toISOString().slice(0, 10)
+  const {loggedUserMail}=useLocalContext();
   const history =useHistory();
   return (
     <Card sx={{ maxWidth: 350 ,backgroundColor:"#fefefz",}}
@@ -36,6 +38,17 @@ export default function ClassCard({classData}) {
       </CardContent>
       <CardActions>
         <Button size="small"  onClick={()=>history.push(`/${classData.code}`)}>Open</Button>
+        <div style={{float:"right"}}>
+        {
+          
+          loggedUserMail===classData.ownerMail?
+           <Button size="small"  >Delete</Button>
+           :
+           <Button size="small"  >UnEnroll</Button>
+
+        }
+        </div>
+       
       </CardActions>
     </Card>
   );

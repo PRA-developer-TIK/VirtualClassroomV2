@@ -1,20 +1,32 @@
-import React, { useState,useEffect } from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
+import React, { useState, useEffect } from 'react';
+// import Table from '@mui/material/Table';
+// import TableBody from '@mui/material/TableBody';
+// import TableCell from '@mui/material/TableCell';
+// import TableContainer from '@mui/material/TableContainer';
+// import TableHead from '@mui/material/TableHead';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Slide from '@mui/material/Slide';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Divider from '@mui/material/Divider';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import { Typography } from '@material-ui/core';
+import Avatar from '@mui/material/Avatar';
 import useStyles from "../../assets/styles/globalStyles/styles";
 import { TextField, Button } from "@material-ui/core";
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { useLocalContext } from "../Context/context";
-import {useRef} from 'react';
+import { useRef } from 'react';
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -22,31 +34,27 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 
-export default function AllStudentsTable({ id,classData,studentsdata}) {
-  const { db } = useLocalContext();
+export default function AllStudentsTable({ id, classData, studentsdata }) {
+  console.log("ass id class data studdata ",id,classData,studentsdata);
+  const { db,showStudentStatus,setShowStudentStatus } = useLocalContext();
   const classes = useStyles();
-  const [csd,setcsd] = useState([]);
-  const [isd,setisd] = useState([]);
-  const [assignmentmarks,setassignmarks] = useState(0);
+  const [csd, setcsd] = useState([]);
+  const [isd, setisd] = useState([]);
+  const [empty_array, setarray] = useState([]);
+  const [assignmentmarks, setassignmarks] = useState(0);
 
   const [open, setOpen] = React.useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  
 
   useEffect(() => {
     requiredinfo()
   }, []);
 
-  const requiredinfo = async ()=> {
-    let completedStudents=[]
-    let incompletedStudents=[]
-    studentsdata.forEach(async(student)=>{
+  const requiredinfo = async () => {
+    let completedStudents = []
+    let incompletedStudents = []
+    studentsdata.forEach(async (student) => {
       const studentAssignmentinfo = await db
         .collection("CreatedClasses")
         .doc(classData.ownerMail)
@@ -58,45 +66,28 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
         .doc(student.email_id)
         .get()
 
-        if(studentAssignmentinfo.exists){
-          if(studentAssignmentinfo.data().Status == false && studentAssignmentinfo.data().onTime == true){
-            let today = new Date();
-            let todaydate = String(today.getDate()).padStart(2, '0');
-            let todaymonth =  String(today.getMonth() + 1).padStart(2, '0');
-            let duedate = studentAssignmentinfo.data().DeadLine;
-            let day = duedate.split("/");
-            if(parseInt(todaydate)>parseInt(day[0]) || parseInt(todaymonth)>parseInt(day[1])){
-              studentAssignmentinfo.set(
-                {
-                  onTime: false,
-                },
-                { merge: true }
-              );
-            }
-          }
-          completedStudents.push(studentAssignmentinfo.data())
-        }
-        else{
-          const notreachedstudent = await db
-            .collection("CreatedClasses")
-            .doc(classData.ownerMail)
-            .collection("ClassC")
-            .doc(classData.code)
-            .collection("Status")
-            .doc(student.email_id)
-            .get()
+      if (studentAssignmentinfo.exists) {
+        completedStudents.push(studentAssignmentinfo.data())
+      }
+      else {
+        const notreachedstudent = await db
+          .collection("CreatedClasses")
+          .doc(classData.ownerMail)
+          .collection("ClassC")
+          .doc(classData.code)
+          .collection("Status")
+          .doc(student.email_id)
+          .get()
 
-            incompletedStudents.push(notreachedstudent.data())
-        }
-        setcsd(completedStudents)
-        setisd(incompletedStudents)
-        
-      })
+        incompletedStudents.push(notreachedstudent.data())
+      }
+      setcsd(completedStudents)
+      setisd(incompletedStudents)
+
+    })
   }
 
-  const handleaddmarks = async (e,mail_id) => {
-  
-
+  const handleaddmarks = async (e, mail_id) => {
     try {
       const addClass = await db
         .collection("CreatedClasses")
@@ -108,12 +99,12 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
         .collection("Submissions")
         .doc(mail_id)
         .set({
-          Marks:assignmentmarks,
+          Marks: assignmentmarks,
         },
-        { merge: true });
-    
-        requiredinfo()
-        
+          { merge: true });
+
+      requiredinfo()
+
 
     } catch (e) {
       alert(e);
@@ -121,73 +112,74 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
   };
 
   return (
-    <div style={{margin:"auto"}}>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Slide in alert dialog
-      </Button>
-      <Dialog
-      
-        PaperProps={{
+    <>
+     
+      <div style={{ margin: "auto" }}>
+
+        <Dialog
+
+          PaperProps={{
             sx: {
-              width:600,
-              
+              width: 600,
+
             }
           }}
-        
-        open={open}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
-        
-      >
-        <DialogTitle>{"Use Google's location service?"}</DialogTitle>
-        <DialogContent > 
 
-       
-    <List sx={{ width: '100%', maxWidth: 600, bgcolor: 'background.paper' }}>
-    {[0,1,2,3,4,5,4,4,4,4,4,4,4,4,].map((item,idx)=>(
-        <>
-      <ListItem   alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-        </ListItemAvatar>
-        <ListItemText
-          primary="Brunch this weekend?"
-          secondary={
-            <React.Fragment>
-              <Typography
-                sx={{ display: 'inline' }}
-                component="span"
-                variant="body2"
-                color="text.primary"
-              >
-                Ali Connors
-              </Typography>
-              {" — I'll be in your neighborhood doing errands thisbs nsdbsuidbsjkdbj…"}
-            </React.Fragment>
+          open={showStudentStatus}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={()=>setShowStudentStatus(false)}
+          aria-describedby="alert-dialog-slide-description"
 
-            
-          }
-        />
-        <div style={{float:"right",fontSize:"2rem"}}>10</div>
-      </ListItem>
-      <Divider variant="inset" component="li" />
-      </>
-        ))}
-        
-      
-      </List>
-            
+        >
+          <DialogTitle>{"Use Google's location service?"}</DialogTitle>
+          <DialogContent >
 
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose}>Agree</Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-    
+
+            <List sx={{ width: '100%', maxWidth: 600, bgcolor: 'background.paper' }}>
+              {studentsdata.map((studStatus, idx) => (
+                <>
+                  <ListItem key={idx} alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary="Brunch this weekend?"
+                      secondary={
+                        <React.Fragment>
+                          <Typography
+                            sx={{ display: 'inline' }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            Ali Connors
+                          </Typography>
+                          {" — I'll be in your neighborhood doing errands thisbs nsdbsuidbsjkdbj…"}
+                        </React.Fragment>
+
+
+                      }
+                    />
+                    <div style={{ float: "right", fontSize: "2rem" }}>10</div>
+                  </ListItem>
+                  <Divider variant="inset" component="li" />
+                </>
+              ))}
+
+
+            </List>
+
+
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={()=>setShowStudentStatus(false)}>Disagree</Button>
+            <Button onClick={()=>setShowStudentStatus(false)}>Agree</Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </>
+
   );
 }
 
@@ -240,7 +232,7 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
     //       <TableCell align="center"><a href={student.UploadedURL[0].URL} target="_blank" rel="noreferrer"><PictureAsPdfIcon /></a></TableCell>
     //       <TableCell align="center">{student.Marks}</TableCell>
     //       </TableRow>
-            
+
     //         ))}
     //       {isd.map((student,index)=>(
     //         <TableRow >
@@ -248,7 +240,7 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
     //         <TableCell align="center">Not Reached</TableCell>
     //         <TableCell align="center">--</TableCell>
     //         </TableRow>
-            
+
     //         ))}
     //       </TableBody>
     //     </Table>

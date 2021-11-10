@@ -19,6 +19,7 @@ export const ContextProvider=({children})=>{
     const [modNo,setModNo]=useState(0);
     const [openFileType,setOpenFileType]=useState(false);
     const [url,setUrl]=useState("");
+    const [showStudentStatus,setShowStudentStatus]=useState(false)
     const classes=useStyles();
     
 
@@ -63,7 +64,8 @@ export const ContextProvider=({children})=>{
         openAddModModal,setOpenAddModModal,
         modNo,setModNo,classes,
         url,setUrl,
-        openFileType,setOpenFileType
+        openFileType,setOpenFileType,
+        showStudentStatus,setShowStudentStatus
         
       };
     return (

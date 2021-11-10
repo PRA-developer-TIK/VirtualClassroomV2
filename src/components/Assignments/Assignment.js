@@ -15,7 +15,7 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 
-function Assignment({ classData ,modules,Assignments,studentsdata}) {
+function Assignment({ classData, modules, Assignments, studentsdata }) {
     const { storage, db, loggedUserMail, loggedUser } = useLocalContext();
 
     const [inputValue, setInputValue] = useState("");
@@ -29,7 +29,7 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
 
     const handleChangeModule = (event) => {
         setModule(event.target.value);
-      };
+    };
 
     const addtostudent = async (modnum, id) => {
         let modData = await db
@@ -41,9 +41,9 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
             .doc(id)
             .get();
 
-        studentsdata.forEach(async(doc)=>{
+        studentsdata.forEach(async (doc) => {
             let progarray = doc.Progress
-            if (progarray[modnum-1]===1){
+            if (progarray[modnum - 1] === 1) {
                 var deadby = new Date();
                 var dd = String(deadby.getDate() + parseInt(3)).padStart(2, '0');
                 var mm = String(deadby.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -51,37 +51,37 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
 
                 deadby = dd + '/' + mm + '/' + yyyy;
 
-                let studentref =db.collection("CreatedClasses")
-                .doc(classData.ownerMail)
-                .collection("ClassC")
-                .doc(classData.code)
-                .collection("Assignment")
-                .doc(modData.data().id)
-                .collection("Submissions")
-                .doc(doc.email_id);
+                let studentref = db.collection("CreatedClasses")
+                    .doc(classData.ownerMail)
+                    .collection("ClassC")
+                    .doc(classData.code)
+                    .collection("Assignment")
+                    .doc(modData.data().id)
+                    .collection("Submissions")
+                    .doc(doc.email_id);
 
 
                 await studentref.set(
-                {
-                    email_id: doc.email_id,
-                    name: doc.name,
-                    Marks: -1,
-                    Status: false,
-                    DeadLine: deadby,
-                    onTime: true,
-                    id: modData.data().id,
-                    Title: modData.data().Title,
-                    Modname: modData.data().Modname,
-                    text: modData.data().text,
-                    pdfURL: modData.data().pdfURL,
-                    imgURL: modData.data().imgURL,
-                    docURL: modData.data().docURL
-                },
-                { merge: true }
+                    {
+                        email_id: doc.email_id,
+                        name: doc.name,
+                        Marks: -1,
+                        Status: false,
+                        DeadLine: deadby,
+                        onTime: true,
+                        id: modData.data().id,
+                        Title: modData.data().Title,
+                        Modname: modData.data().Modname,
+                        text: modData.data().text,
+                        pdfURL: modData.data().pdfURL,
+                        imgURL: modData.data().imgURL,
+                        docURL: modData.data().docURL
+                    },
+                    { merge: true }
                 );
             }
         });
-        
+
     }
     const handleUpload = async (e) => {
 
@@ -94,7 +94,7 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
             .collection("Assignment")
             .doc(id);
 
-        let new_collection= await db
+        let new_collection = await db
             .collection("CreatedClasses")
             .doc(classData.ownerMail)
             .collection("ClassC")
@@ -216,7 +216,7 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
             alert("input value needed")
         }
         let lastChar = module.substr(module.length - 1)
-        addtostudent(parseInt(lastChar),id)
+        addtostudent(parseInt(lastChar), id)
 
     };
     const classes = useStyles();
@@ -234,24 +234,47 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
                 }}
                 boxShadow={6}
             >
+                <div style={{marginBottom:"1%"}}> 
                 <TextField
+                    variant="outlined"
                     fullWidth
                     label="Title"
                     onChange={(e) => {
                         setInputTitle(e.target.value);
                     }}
                 />
+                </div>
+
+                <div style={{marginBottom:"1%"}}> 
                 <TextField
+                    variant="outlined"
                     id="filled-multiline-static"
                     label="Description"
                     multiline
                     rows={2}
                     fullWidth
-                    variant="filled"
+                    
                     onChange={(e) => {
                         setInputValue(e.target.value);
                     }}
                 />
+                </div>
+
+                <div style={{marginBottom:"1%"}} >
+                <TextField
+                    id="outlined-number"
+                    
+                    label="Number"
+                    type="number"
+                    variant="outlined"
+                    inputProps={{ min: 0 }}
+                    
+
+                    InputLabelProps={{
+                        shrink: true,
+                    }}
+                />
+                </div>
 
 
                 <div style={{ padding: "2%" }}>
@@ -277,29 +300,29 @@ function Assignment({ classData ,modules,Assignments,studentsdata}) {
                         </Fab>
                     </div>
                     <FormControl
-            style={{ width: "20%", float: "right", margin: "0 2% 2% 2%" }}
-          >
-            <InputLabel  id="demo-simple-select-label">ADD TO</InputLabel>
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              value={module}
-              label="Module"
-              onChange={(e) => handleChangeModule(e)}
-            >
-              {modules.map((data, index) => (
-                <MenuItem key={index} value={data.modName}>
-                  {data.modName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+                        style={{ width: "20%", float: "right", margin: "0 2% 2% 2%" }}
+                    >
+                        <InputLabel id="demo-simple-select-label">ADD TO</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={module}
+                            label="Module"
+                            onChange={(e) => handleChangeModule(e)}
+                        >
+                            {modules.map((data, index) => (
+                                <MenuItem key={index} value={data.modName}>
+                                    {data.modName}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 </div>
-                
+
             </Box>)
             }
-            <AllAssignment classData={classData} modules={modules} Assignments={Assignments} studentsdata={studentsdata}/>
-            
+            <AllAssignment classData={classData} modules={modules} Assignments={Assignments} studentsdata={studentsdata} />
+
         </Container >
     );
 }
