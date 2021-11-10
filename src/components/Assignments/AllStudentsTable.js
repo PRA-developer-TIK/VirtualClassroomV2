@@ -34,14 +34,18 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 
-export default function AllStudentsTable({ id, classData, studentsdata }) {
-  console.log("ass id class data studdata ",id,classData,studentsdata);
-  const { db,showStudentStatus,setShowStudentStatus } = useLocalContext();
+export default function AllStudentsTable({ id, classData, studentsdata,assmtDetails }) {
+  console.log("stdu  details ",studentsdata);
+  const { db,showStudentStatus,setShowStudentStatus,loggedUser } = useLocalContext();
   const classes = useStyles();
   const [csd, setcsd] = useState([]);
   const [isd, setisd] = useState([]);
   const [empty_array, setarray] = useState([]);
   const [assignmentmarks, setassignmarks] = useState(0);
+
+  console.log("isd ",isd);
+  console.log("csd ",csd);
+
 
   const [open, setOpen] = React.useState(false);
 
@@ -132,16 +136,16 @@ export default function AllStudentsTable({ id, classData, studentsdata }) {
           aria-describedby="alert-dialog-slide-description"
 
         >
-          <DialogTitle>{"Use Google's location service?"}</DialogTitle>
+          <DialogTitle>{assmtDetails.Title}</DialogTitle>
           <DialogContent >
-
-
             <List sx={{ width: '100%', maxWidth: 600, bgcolor: 'background.paper' }}>
-              {studentsdata.map((studStatus, idx) => (
+              {csd.map((stud, idx) => (
                 <>
-                  <ListItem key={idx} alignItems="flex-start">
+                
+                  <ListItem key={idx} alignItems="flex-start" >
+                    
                     <ListItemAvatar>
-                      <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+                      <Avatar   />
                     </ListItemAvatar>
                     <ListItemText
                       primary="Brunch this weekend?"
@@ -151,7 +155,7 @@ export default function AllStudentsTable({ id, classData, studentsdata }) {
                             sx={{ display: 'inline' }}
                             component="span"
                             variant="body2"
-                            color="text.primary"
+                            color="primary"
                           >
                             Ali Connors
                           </Typography>
@@ -166,6 +170,32 @@ export default function AllStudentsTable({ id, classData, studentsdata }) {
                   <Divider variant="inset" component="li" />
                 </>
               ))}
+
+              {isd.map((stud,idx)=>(
+                <>
+                
+                <ListItem 
+                key={idx} 
+                alignItems="flex-start"  
+                style={{backgroundColor:"#ffcccb",borderRadius:"10px"}}
+                >
+                  
+                  <ListItemAvatar>
+                    <Avatar   />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={stud.name}
+                    
+                  />
+                  <div style={{ float: "right", fontSize: "1rem",color:"#f70d1a" }}>NOT REACHED</div>
+                </ListItem>
+                <Divider variant="inset" component="li" />
+              </>
+
+
+              ))}
+
+
 
 
             </List>

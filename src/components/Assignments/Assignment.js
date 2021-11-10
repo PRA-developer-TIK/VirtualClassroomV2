@@ -236,6 +236,17 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
             >
                 <div style={{marginBottom:"1%"}}> 
                 <TextField
+                    sx={{
+
+                        width: { sm: 250, md: 350 },
+                    
+                        "& .MuiOutlinedInput-root:hover": {
+                          "& > fieldset": {
+                            borderColor: "orange"
+                          }
+                        }
+                      }}
+                    
                     variant="outlined"
                     fullWidth
                     label="Title"
