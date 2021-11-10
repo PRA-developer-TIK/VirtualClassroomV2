@@ -12,6 +12,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import DelConfirm from "../FeedbackUtils/DeleteConfirm";
 
 
 export default function AllModules({ classData, modules,progress }) {
@@ -25,7 +26,7 @@ export default function AllModules({ classData, modules,progress }) {
   
 
 
-  const { loggedUserMail, db, openImg, setOpenImg,url,openFileType } = useLocalContext();
+  const { loggedUserMail, db, openImg, url,delDialog} = useLocalContext();
 
   //open closing accordion
   const [open, setOpen] = React.useState(false);
@@ -128,13 +129,13 @@ export default function AllModules({ classData, modules,progress }) {
             Status: false,
             DeadLine: deadby,
             onTime: true,
-            id: doc.data().id,
-            Title: doc.data().Title,
-            Modname: doc.data().Modname,
-            text: doc.data().text,
-            pdfURL: doc.data().pdfURL,
-            imgURL: doc.data().imgURL,
-            docURL: doc.data().docURL
+            id: doc.data()?.id,
+            Title: doc.data()?.Title,
+            Modname: doc.data()?.Modname,
+            text: doc.data()?.text,
+            pdfURL: doc.data()?.pdfURL,
+            imgURL: doc.data()?.imgURL,
+            docURL: doc.data()?.docURL
           },
           { merge: true }
         );
@@ -245,6 +246,7 @@ export default function AllModules({ classData, modules,progress }) {
         
       ))}
       {openImg && <ImgModal url={url}  />}
+      {delDialog.status && <DelConfirm/>}
     </>
   );
 }

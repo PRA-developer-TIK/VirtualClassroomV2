@@ -8,9 +8,10 @@ import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import LinkIcon from "@mui/icons-material/Link";
 import ImgModal from "../teacher/ImageModal";
 import ImageIcon from "@mui/icons-material/Image";
+import DelConfirm from "../FeedbackUtils/DeleteConfirm";
 const Announcment = ({ classData }) => {
   const [announcments, setAnnouncments] = useState([]);
-  const { db, openImg, setOpenImg, setUrl, url } = useLocalContext();
+  const { db, openImg, setOpenImg, setUrl, url ,loggedUserMail,setDelDialog,delDialog} = useLocalContext();
   useEffect(() => {
     if (classData) {
       let unsubscribe = db
@@ -26,6 +27,7 @@ const Announcment = ({ classData }) => {
   // console.log(announcments);
 
   const handleDelAnn = (id) => {
+    setDelDialog({...delDialog,status:false});
     db
       .collection("announcements")
       .doc(classData.code)
@@ -53,7 +55,9 @@ const Announcment = ({ classData }) => {
 
           <div key={index} className="amt">
             <div style={{ float: "right", padding: "2%", cursor: "pointer" }}>
-              <DeleteIcon onClick={() => handleDelAnn(item.id)} />
+
+              {item.sender===loggedUserMail && <DeleteIcon onClick={() =>setDelDialog({...delDialog,status:true,onConfirm:()=>handleDelAnn(item.id)}) } />}
+              
             </div>
             <div className="amt__Cnt">
               <div className="amt__top">
@@ -114,6 +118,7 @@ const Announcment = ({ classData }) => {
         </Box>
       ))}
       {openImg && <ImgModal url={url} />}
+      {delDialog.status && <DelConfirm/>}
     </>
   );
 };

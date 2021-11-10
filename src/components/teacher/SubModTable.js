@@ -28,11 +28,13 @@ function Row({ module, classData }) {
   // console.log("module is ",module)
   const [open, setOpen] = useState(false)
 
-  const { db, loggedUserMail, setOpenImg, setUrl ,setOpenFileType} = useLocalContext();
+  const { db, loggedUserMail, setOpenImg, setUrl ,setOpenFileType,delDialog,setDelDialog} = useLocalContext();
 
   const handleDelFile = async (type, data, id) => {
-    console.log(type, data, id);
-    let fileRef = await db
+    setDelDialog({...delDialog,status:false});
+    console.log("in del");
+
+      let fileRef = await db
       .collection("CreatedClasses")
       .doc(classData.ownerMail)
       .collection("ClassC")
@@ -65,6 +67,9 @@ function Row({ module, classData }) {
 
       })
     }
+
+    
+    
 
 
 
@@ -127,8 +132,9 @@ function Row({ module, classData }) {
                       {loggedUserMail === classData.ownerMail &&
                         (<TableCell align="center">< DeleteIcon onClick={() => {
                           // setDeleteDialog(true);
+                          setDelDialog({value:"delete",status:true,onConfirm:()=>{handleDelFile("pdf", data, module.id)}});
 
-                          handleDelFile("pdf", data, module.id);
+                          
                         }}
                           style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)
                       }
@@ -147,9 +153,10 @@ function Row({ module, classData }) {
                       <TableCell align="center"><InsertDriveFileIcon onClick={() => { setOpenImg(true); setUrl(data.URL);setOpenFileType("doc") }} /></TableCell>
                       {loggedUserMail === classData.ownerMail &&
                         (<TableCell align="center">< DeleteIcon onClick={() => {
-                          // setDeleteDialog(true);
-
-                          handleDelFile("doc", data, module.id);
+                          
+                          setDelDialog({value:"delete",status:true,onConfirm:()=>{handleDelFile("doc", data, module.id);}});
+                         
+                          
                         }}
                           style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)}
                     </TableRow>
@@ -166,8 +173,9 @@ function Row({ module, classData }) {
                       {loggedUserMail === classData.ownerMail &&
                         (<TableCell align="center">< DeleteIcon onClick={() => {
                           // setDeleteDialog(true);
-
-                          handleDelFile("img", data, module.id);
+                          
+                          setDelDialog({value:"delete",status:true,onConfirm:()=>{handleDelFile("img", data, module.id);}});
+                          
                         }}
                           style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)}
 
@@ -188,8 +196,8 @@ function Row({ module, classData }) {
                       {loggedUserMail === classData.ownerMail &&
                         (<TableCell align="center">< DeleteIcon onClick={() => {
                           // setDeleteDialog(true);
-
-                          handleDelFile("link", URL, module.id);
+                          setDelDialog({value:"delete",status:true,onConfirm:()=>{handleDelFile("link", URL, module.id);}});
+                          
                         }}
                           style={{ cursor: "pointer" }} fontSize="medium" /></TableCell>)}
                     </TableRow>

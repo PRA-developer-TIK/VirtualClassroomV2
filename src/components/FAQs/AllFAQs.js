@@ -20,12 +20,12 @@ import Stack from '@mui/material/Stack';
 import LinkIcon from "@mui/icons-material/Link";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import ImageIcon from "@mui/icons-material/Image";
-
+import DelConfirm from "../FeedbackUtils/DeleteConfirm";
 
 
 export default function AllFAQ({ questions, classData }) {
   const classes = useStyles();
-  const { loggedUserMail, db, openImg, setOpenImg } = useLocalContext();
+  const {  db, openImg, setOpenImg,delDialog,setDelDialog,loggedUserMail } = useLocalContext();
   const [url, setUrl] = useState();
 
   const [open, setOpen] = React.useState(false);
@@ -45,6 +45,7 @@ export default function AllFAQ({ questions, classData }) {
   };
 
   const handleDelFaq = async (ques, ans) => {
+    setDelDialog({...delDialog,status:false})
     let faq = await db
       .collection("FAQs")
       .doc(classData.code)
@@ -149,15 +150,18 @@ export default function AllFAQ({ questions, classData }) {
                   primary={ans.answer}
 
                 />
-                <DeleteIcon onClick={() => handleDelFaq(question, ans)} style={{ cursor: "pointer" }} />
+                {<DeleteIcon onClick={() =>setDelDialog({...delDialog,status:true,onConfirm:()=>handleDelFaq(question, ans)} )} style={{ cursor: "pointer" }} />}
+                
               </ListItem>
             ))}
           </AccordionDetails>
           {openImg && <ImgModal url={url} />}
+          {delDialog.status && <DelConfirm/>}
         </Accordion>
 
         // </div>
       ))}
+      
     </>
   )
 }

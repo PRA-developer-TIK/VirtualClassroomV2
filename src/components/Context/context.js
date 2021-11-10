@@ -20,6 +20,8 @@ export const ContextProvider=({children})=>{
     const [openFileType,setOpenFileType]=useState(false);
     const [url,setUrl]=useState("");
     const [showStudentStatus,setShowStudentStatus]=useState(false)
+    const [delDialog,setDelDialog]=useState({status:false,value:""});
+    const [confDel,setConfDel]=useState(false);
     const classes=useStyles();
     
 
@@ -65,7 +67,10 @@ export const ContextProvider=({children})=>{
         modNo,setModNo,classes,
         url,setUrl,
         openFileType,setOpenFileType,
-        showStudentStatus,setShowStudentStatus
+        showStudentStatus,setShowStudentStatus,
+        delDialog,setDelDialog,
+        confDel,setConfDel
+
         
       };
     return (

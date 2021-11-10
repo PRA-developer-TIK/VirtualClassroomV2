@@ -16,11 +16,12 @@ import ImageIcon from "@mui/icons-material/Image";
 
 import StudentStatus from "./StudentStatus";
 import AllStudentsTable from "./AllStudentsTable";
+import DelConfirm from "../FeedbackUtils/DeleteConfirm";
 
 
 const AllAssignment = ({ classData, modules, Assignments, studentsdata }) => {
   console.log(Assignments);
-  const { db, openImg, setOpenImg, setOpenFileType, setShowStudentStatus } = useLocalContext();
+  const { db, openImg, setOpenImg, setOpenFileType, setShowStudentStatus,delDialog,setDelDialog } = useLocalContext();
   const [url, setUrl] = useState("");
   const [expanded, setExpanded] = React.useState(false);
   const [assmtId, setAssmtId] = useState(0);
@@ -33,6 +34,8 @@ const AllAssignment = ({ classData, modules, Assignments, studentsdata }) => {
   };
 
   const handleDelAssignment = (module, id) => {
+    setDelDialog({...delDialog,status:false})
+
     db
       .collection("CreatedClasses")
       .doc(classData.ownerMail)
@@ -59,7 +62,8 @@ const AllAssignment = ({ classData, modules, Assignments, studentsdata }) => {
             <Card sx={{ margin: "2%", width: "35%", backgroundColor: "#fefefe", padding: 2 }} key={index}>
 
               <div style={{ float: "right", padding: "2%", cursor: "pointer" }}>
-                <DeleteIcon sx={{ color: "#d11a2a" }} onClick={() => handleDelAssignment(item.Modname, item.id)} />
+                <DeleteIcon sx={{ color: "#d11a2a" }} onClick={() =>setDelDialog({...delDialog,status:true,onConfirm:()=>handleDelAssignment(item.Modname, item.id)}) } />
+                
               </div>
               <div className="amt__Cnt">
                 <h2 className="amt__txt">{item.Title}</h2>
@@ -135,9 +139,11 @@ const AllAssignment = ({ classData, modules, Assignments, studentsdata }) => {
           assmtDetails={Assignments[assmtIdx]}
         />
         :
-        "null"
+        <></>
       }
+      {delDialog.status  && <DelConfirm/>}
     </>
+
 
   )
 

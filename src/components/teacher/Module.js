@@ -238,7 +238,7 @@ function Module({ modules, classData, progress }) {
             borderRadius: 10,
             m: "auto",
             mt: 4,
-            color:"#252934"
+            color:"#252934",
 
           }}
           boxShadow={6}
