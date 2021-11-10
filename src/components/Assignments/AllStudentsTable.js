@@ -27,7 +27,6 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
   const classes = useStyles();
   const [csd,setcsd] = useState([]);
   const [isd,setisd] = useState([]);
-  const [empty_array,setarray] = useState([]);
   const [assignmentmarks,setassignmarks] = useState(0);
 
   const [open, setOpen] = React.useState(false);
@@ -60,6 +59,21 @@ export default function AllStudentsTable({ id,classData,studentsdata}) {
         .get()
 
         if(studentAssignmentinfo.exists){
+          if(studentAssignmentinfo.data().Status == false && studentAssignmentinfo.data().onTime == true){
+            let today = new Date();
+            let todaydate = String(today.getDate()).padStart(2, '0');
+            let todaymonth =  String(today.getMonth() + 1).padStart(2, '0');
+            let duedate = studentAssignmentinfo.data().DeadLine;
+            let day = duedate.split("/");
+            if(parseInt(todaydate)>parseInt(day[0]) || parseInt(todaymonth)>parseInt(day[1])){
+              studentAssignmentinfo.set(
+                {
+                  onTime: false,
+                },
+                { merge: true }
+              );
+            }
+          }
           completedStudents.push(studentAssignmentinfo.data())
         }
         else{
