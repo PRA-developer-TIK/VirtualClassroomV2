@@ -28,6 +28,10 @@ function CreateClass() {
   const [invalidmails, setinvalidmails] = useState([]);
   const [mailcount, setmailcount] = useState(0);
   const [noofmods, setmodcount] = useState(0);
+  const [error, setError] = useState(false);
+  const [errortxt, setErrortxt] = useState("");
+  const [errorForModno, setErrorForModno] = useState(false);
+  const [errortxtForModno, setErrortxtForModno] = useState("");
 
   
   const shownumber = (e) => {
@@ -48,74 +52,92 @@ function CreateClass() {
   //firebase details
 
   const handleSubmit = async (e) => {
-    console.log(className, subject, domain, mails,loggedUserMail );
     e.preventDefault();
-    console.log("id is ", uuidv4());
-    console.log("timestamp");
-    setmailcount(0)
-    const id = uuidv4();
-
-    try {
-      const addClass = await db
+    if (className===""){
+      setError(true);
+      setErrortxt("Class Name is Required");
+      return;
+    }else if (noofmods===0){
+      setErrorForModno(true);
+      setErrortxtForModno("Number of mods required");
+      return;
+    }
+    const id = className;
+    const classtobecreated = await db
         .collection("CreatedClasses")
         .doc(loggedUserMail)
         .collection("ClassC")
         .doc(id)
-        .set({
-          code: id,
-          dateCreated: new Date().toISOString().substr(0, 10),
-          ownerMail: loggedUserMail,
-          className: className,
-          subject: subject,
-          domain: domain,
-          ownerAvatarURL:loggedUser.photoURL,
-          enrolled: [],
-        });
-
-        for (let j=1;j<=noofmods;j++){
-          await db
+        .get()
+    if (classtobecreated.exists){
+      setError(true);
+      setErrortxt("Class With Same Name Exists");
+      return;
+    }
+    else{
+      try {
+        const addClass = await db
           .collection("CreatedClasses")
           .doc(loggedUserMail)
           .collection("ClassC")
           .doc(id)
-          .collection("Modules")
-          .doc(`module${j}`)
           .set({
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            modName: `module${j}`,
+            code: id,
+            dateCreated: new Date().toISOString().substr(0, 10),
+            ownerMail: loggedUserMail,
+            className: className,
+            subject: subject,
+            domain: domain,
+            ownerAvatarURL:loggedUser.photoURL,
+            enrolled: [],
           });
-        }
-      
-      let temp_invalidmails = []
-      for (let i=0;i<mailarray.length;i++){
-          let current_mail=mailarray[i]
-          let prog_array = Array(noofmods).fill(0)
-           if(validator.isEmail(current_mail)) {
-              const mail_list = await db
-                .collection("CreatedClasses")
-                .doc(loggedUserMail)
-                .collection("ClassC")
-                .doc(id)
-                .collection("Status")
-                .doc(current_mail)
-                .set({
-                  email_id: current_mail,
-                  name: "",
-                  Enrolled_Status: false,
-                  Progress: prog_array,
-                });
-            } else {
-              temp_invalidmails.push(current_mail)
-            }
-            
-      }
-      console.log(temp_invalidmails)
-      setinvalidmails(temp_invalidmails)
+
+          for (let j=1;j<=noofmods;j++){
+            await db
+            .collection("CreatedClasses")
+            .doc(loggedUserMail)
+            .collection("ClassC")
+            .doc(id)
+            .collection("Modules")
+            .doc(`module${j}`)
+            .set({
+              timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+              modName: `module${j}`,
+            });
+          }
         
-      setCreateClassDialog(false);
-      console.log("class added", addClass);
-    } catch (e) {
-      alert(e);
+        let temp_invalidmails = []
+        for (let i=0;i<mailarray.length;i++){
+            let current_mail=mailarray[i]
+            let prog_array = Array(noofmods).fill(0)
+            if(validator.isEmail(current_mail)) {
+                const mail_list = await db
+                  .collection("CreatedClasses")
+                  .doc(loggedUserMail)
+                  .collection("ClassC")
+                  .doc(id)
+                  .collection("Status")
+                  .doc(current_mail)
+                  .set({
+                    email_id: current_mail,
+                    name: "",
+                    Enrolled_Status: false,
+                    Progress: prog_array,
+                  });
+              } else {
+                temp_invalidmails.push(current_mail)
+              }
+              
+        }
+        console.log(temp_invalidmails)
+        setinvalidmails(temp_invalidmails)
+          
+        setCreateClassDialog(false);
+        console.log("class added", addClass);
+      } catch (e) {
+        alert(e);
+      }
+      setmailcount(0)
     }
   };
 
@@ -139,7 +161,9 @@ function CreateClass() {
               color="primary"
               className={classes.createInputFields}
               required={true}
-              onChange={(e) => setClassName(e.target.value)}
+              error={error}
+              helperText={error && errortxt}
+              onChange={(e) => {setClassName(e.target.value);setError(false);}}
             />
             <TextField
               label="Subject"
@@ -166,8 +190,10 @@ function CreateClass() {
               color="primary"
               className={classes.createInputFields}
               required={true}
+              error={errorForModno}
+              helperText={errorForModno && errortxtForModno}
               inputProps={{ min: 1, max: 10 }}
-              onChange={(e) => setmodcount(parseInt(e.target.value))}
+              onChange={(e) => {setmodcount(parseInt(e.target.value));setErrorForModno(false)}}
             />
             <TextField
               label="Students mails"

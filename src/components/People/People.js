@@ -250,6 +250,7 @@ export default function People({ classData, Assignments }) {
               
               
             }}
+<<<<<<< Updated upstream
               style={{ cursor: "pointer" }} fontSize="medium" />
 
           }</TableCell>
@@ -263,6 +264,55 @@ export default function People({ classData, Assignments }) {
                 </Typography>
                 <Table size="small" aria-label="purchases">
                   <TableHead>
+=======
+          >
+          <div style={{ display: "flex", marginTop: "20px" }}>
+          <TextField
+                  align="center"
+                  label="Add New Students Email"
+                  type="email"
+                  variant="outlined"
+                  color="primary"
+                  error={errortoadd}
+                  onChange={(e) => {setEmail(e.target.value);setErrortoadd(false)}}
+                  helperText={errortoadd && errortxttoadd}
+                  style={{ width: "100%", margin: "1%" }}
+                  required={false}
+                />
+            <Button
+                onClick={(e) => {addstudent(e)}}
+                style={{ margin: "1%" }}
+                variant="outlined"
+              >
+                Add
+              </Button>
+            </div>
+          </Box>
+          <div style={{ display: "flex", marginTop: "20px" }}>
+          <TextField
+                  align="center"
+                  label="Search by Students email"
+                  type="email"
+                  variant="outlined"
+                  color="primary"
+                  error={error}
+                  onChange={(e) => {setMail(e.target.value);setError(false)}}
+                  helperText={error && errortxt}
+                  style={{ width: "100%", margin: "1%" }}
+                  required={false}
+                />
+            <Button
+                onClick={(e) => searchstudent(e)}
+                style={{ margin: "1%" }}
+                variant="outlined"
+              >
+                Search
+              </Button>
+            </div>
+            <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+>>>>>>> Stashed changes
                     <TableRow>
                       <TableCell><h3>Modules</h3></TableCell>
                       <TableCell align="center"><h3>Status</h3></TableCell>

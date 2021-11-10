@@ -22,6 +22,11 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
     const [module, setModule] = React.useState("");
     const [inputTitle, setInputTitle] = useState("");
     const [files, setFiles] = useState([]);
+    const [maxdays, setmaxdays] = useState(0);
+    const [error, setError] = useState(false);
+    const [errortxt, setErrortxt] = useState("");
+    const [errorformaxdays, setErrorformaxdays] = useState(false);
+    const [errortxtformaxdays, setErrortxtformaxdays] = useState("");
     const handleChange = (e) => {
 
         setFiles(Object.keys(e.target.files).map(key => (e.target.files[key])));
@@ -45,7 +50,7 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
             let progarray = doc.Progress
             if (progarray[modnum - 1] === 1) {
                 var deadby = new Date();
-                var dd = String(deadby.getDate() + parseInt(3)).padStart(2, '0');
+                var dd = String(deadby.getDate() + parseInt(maxdays)).padStart(2, '0');
                 var mm = String(deadby.getMonth() + 1).padStart(2, '0'); //January is 0!
                 var yyyy = deadby.getFullYear();
 
@@ -85,145 +90,168 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
     }
     const handleUpload = async (e) => {
 
-        let id = uuidv4();
-        let dbRef = await db
-            .collection("CreatedClasses")
-            .doc(classData.ownerMail)
-            .collection("ClassC")
-            .doc(classData.code)
-            .collection("Assignment")
-            .doc(id);
+        if (inputTitle===""){
+            setError(true);
+            setErrortxt("Title is required");
+            return;
+        } else if (maxdays===0){
+            setErrorformaxdays(true);
+            setErrortxtformaxdays("No Of days required");
+            return;
+        } else {
+            let id = `${module}-${inputTitle}`;
+            let assign = await db
+                .collection("CreatedClasses")
+                .doc(classData.ownerMail)
+                .collection("ClassC")
+                .doc(classData.code)
+                .collection("Assignment")
+                .doc(id)
+                .get();
+            
+            if (assign.exists){
+                setError(true);
+                setErrortxt("Assignment with same title exists");
+                return;
+            } else {
+                let dbRef = await db
+                .collection("CreatedClasses")
+                .doc(classData.ownerMail)
+                .collection("ClassC")
+                .doc(classData.code)
+                .collection("Assignment")
+                .doc(id);
 
-        let new_collection = await db
-            .collection("CreatedClasses")
-            .doc(classData.ownerMail)
-            .collection("ClassC")
-            .doc(classData.code)
-            .collection("Assignment")
-            .doc(id)
-            .collection("Submissions")
+            let new_collection = await db
+                .collection("CreatedClasses")
+                .doc(classData.ownerMail)
+                .collection("ClassC")
+                .doc(classData.code)
+                .collection("Assignment")
+                .doc(id)
+                .collection("Submissions")
 
-        if (files.length > 0 && inputValue) {
-            files.forEach(async (file, idx) => {
-                console.log(file.name, idx);
-                let imgTypes = ["png", "jpeg", "jpg"];
-                let docTypes = [
-                    "doc",
-                    "docx",
-                    "application/msword",
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ];
-                let fileType = files[idx].name.split(".").slice(-1)[0].toLowerCase();
+            if (files.length > 0 && inputValue) {
+                files.forEach(async (file, idx) => {
+                    console.log(file.name, idx);
+                    let imgTypes = ["png", "jpeg", "jpg"];
+                    let docTypes = [
+                        "doc",
+                        "docx",
+                        "application/msword",
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    ];
+                    let fileType = files[idx].name.split(".").slice(-1)[0].toLowerCase();
 
-                const uploadImage = storage.ref(`${fileType}s/${file.name}`).put(file);
-                let url;
-                uploadImage.on("state_changed", async (snapshot) => {
-                    url = await storage.ref(`${fileType}s`).child(file.name).getDownloadURL();
-                    console.log("code is", classData.code);
-                    console.log(url);
+                    const uploadImage = storage.ref(`${fileType}s/${file.name}`).put(file);
+                    let url;
+                    uploadImage.on("state_changed", async (snapshot) => {
+                        url = await storage.ref(`${fileType}s`).child(file.name).getDownloadURL();
+                        console.log("code is", classData.code);
+                        console.log(url);
 
-                    let progress =
-                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log("progress", progress);
+                        let progress =
+                            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log("progress", progress);
 
-                    let obj = {};
-                    obj.URL = url;
-                    obj.name = file.name;
+                        let obj = {};
+                        obj.URL = url;
+                        obj.name = file.name;
 
 
-                    if (progress === 100) {
-                        console.log("filetyoe is ", fileType);
-                        try {
-                            if (fileType === "pdf") {
-                                await dbRef.set(
-                                    {
-                                        id: id,
-                                        timestamp: firebase.firestore.Timestamp.now(),
-                                        text: inputValue,
-                                        pdfURL: firebase.firestore.FieldValue.arrayUnion(obj),
-                                        docURL: [],
-                                        imgURL: [],
-                                    },
-                                    { merge: true }
-                                );
-                            } else if (imgTypes.includes(fileType)) {
-                                await dbRef.set(
-                                    {
-                                        id: id,
-                                        timestamp: firebase.firestore.Timestamp.now(),
-                                        text: inputValue,
-                                        imgURL: firebase.firestore.FieldValue.arrayUnion(obj),
-                                        pdfURL: [],
-                                        docURL: [],
-                                    },
-                                    { merge: true }
-                                );
-                            } else if (docTypes.includes(fileType)) {
-                                await dbRef.set(
-                                    {
-                                        id: id,
-                                        timestamp: firebase.firestore.Timestamp.now(),
-                                        text: inputValue,
-                                        docURL: firebase.firestore.FieldValue.arrayUnion(obj),
-                                        pdfURL: [],
-                                        imgURL: [],
-                                    },
-                                    { merge: true }
-                                );
+                        if (progress === 100) {
+                            console.log("filetyoe is ", fileType);
+                            try {
+                                if (fileType === "pdf") {
+                                    await dbRef.set(
+                                        {
+                                            id: id,
+                                            timestamp: firebase.firestore.Timestamp.now(),
+                                            text: inputValue,
+                                            pdfURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                                            docURL: [],
+                                            imgURL: [],
+                                        },
+                                        { merge: true }
+                                    );
+                                } else if (imgTypes.includes(fileType)) {
+                                    await dbRef.set(
+                                        {
+                                            id: id,
+                                            timestamp: firebase.firestore.Timestamp.now(),
+                                            text: inputValue,
+                                            imgURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                                            pdfURL: [],
+                                            docURL: [],
+                                        },
+                                        { merge: true }
+                                    );
+                                } else if (docTypes.includes(fileType)) {
+                                    await dbRef.set(
+                                        {
+                                            id: id,
+                                            timestamp: firebase.firestore.Timestamp.now(),
+                                            text: inputValue,
+                                            docURL: firebase.firestore.FieldValue.arrayUnion(obj),
+                                            pdfURL: [],
+                                            imgURL: [],
+                                        },
+                                        { merge: true }
+                                    );
+                                }
+
+                                if (inputTitle) {
+                                    await dbRef.set(
+                                        {
+                                            Title: inputTitle,
+                                            Modname: module
+                                        },
+                                        { merge: true }
+                                    );
+                                }
+                            } catch (e) {
+                                alert(e);
                             }
-
-                            if (inputTitle) {
-                                await dbRef.set(
-                                    {
-                                        Title: inputTitle,
-                                        Modname: module
-                                    },
-                                    { merge: true }
-                                );
-                            }
-                        } catch (e) {
-                            alert(e);
                         }
+
+
+                    });
+
+                })
+
+
+            } else if (inputValue) {
+                try {
+                    if (inputTitle) {
+                        await dbRef.set(
+                            {
+                                Title: inputTitle,
+                                Modname: module
+                            },
+                            { merge: true }
+                        );
                     }
 
-
-                });
-
-            })
-
-
-        } else if (inputValue) {
-            try {
-                if (inputTitle) {
                     await dbRef.set(
                         {
-                            Title: inputTitle,
-                            Modname: module
+                            id: id,
+                            timestamp: firebase.firestore.Timestamp.now(),
+                            text: inputValue,
+                            pdfURL: [],
+                            docURL: [],
+                            imgURL: [],
                         },
                         { merge: true }
                     );
+                } catch (e) {
+
                 }
-
-                await dbRef.set(
-                    {
-                        id: id,
-                        timestamp: firebase.firestore.Timestamp.now(),
-                        text: inputValue,
-                        pdfURL: [],
-                        docURL: [],
-                        imgURL: [],
-                    },
-                    { merge: true }
-                );
-            } catch (e) {
-
+            } else {
+                alert("input value needed")
             }
-        } else {
-            alert("input value needed")
-        }
-        let lastChar = module.substr(module.length - 1)
-        addtostudent(parseInt(lastChar), id)
-
+            let lastChar = module.substr(module.length - 1)
+            addtostudent(parseInt(lastChar), id)}
+}
     };
     const classes = useStyles();
 
@@ -256,8 +284,12 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
                     variant="outlined"
                     fullWidth
                     label="Title"
+                    error={error}
+                    helperText={error && errortxt}
+                    required={true}
                     onChange={(e) => {
                         setInputTitle(e.target.value);
+                        setError(false);
                     }}
                 />
                 </div>
@@ -281,14 +313,22 @@ function Assignment({ classData, modules, Assignments, studentsdata }) {
                 <TextField
                     id="outlined-number"
                     
-                    label="Number"
+                    label="Max No. Of Days"
                     type="number"
                     variant="outlined"
                     inputProps={{ min: 0 }}
+                    error={errorformaxdays}
+                    helperText={errorformaxdays && errortxtformaxdays}
+                    required={true}
                     
 
                     InputLabelProps={{
                         shrink: true,
+                    }}
+
+                    onChange={(e) => {
+                        setmaxdays(parseInt(e.target.value));
+                        setErrorformaxdays(false);;
                     }}
                 />
                 </div>

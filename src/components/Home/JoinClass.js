@@ -105,7 +105,8 @@ export default function JoinClass() {
               .set(
                 {
                   Enrolled_Status : true,
-                  name: loggedUser.displayName, },
+                  name: loggedUser.displayName,
+                  avatarURL: loggedUser.photoURL },
                 { merge: true }
               );
             setJoinClassDialog(false);
@@ -171,11 +172,11 @@ export default function JoinClass() {
               <Button onClick={()=>{auth.signOut();history.push("/login")}} variant="outlined">Logout</Button>
             </div>
             <div className={classes.joinClass}>
-              <h3>Class Code</h3>
-              <h4>Ask your teacher for code and then, enter it!!</h4>
+              <h3>Class Name</h3>
+              <h4>Ask your teacher for Class Name and then, enter it!!</h4>
               <div style={{ display: "flex", marginTop: "20px" }}>
                 <TextField
-                  label="Class Code"
+                  label="Class Name"
                   type="text"
                   variant="outlined"
                   color="primary"
