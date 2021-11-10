@@ -172,10 +172,10 @@ export default function AllStudentsTable({ id, classData, studentsdata,assmtDeta
               ))}
 
               {isd.map((stud,idx)=>(
-                <>
+                <div  key={idx} >
                 
                 <ListItem 
-                key={idx} 
+                
                 alignItems="flex-start"  
                 style={{backgroundColor:"#ffcccb",borderRadius:"10px"}}
                 >
@@ -190,7 +190,7 @@ export default function AllStudentsTable({ id, classData, studentsdata,assmtDeta
                   <div style={{ float: "right", fontSize: "1rem",color:"#f70d1a" }}>NOT REACHED</div>
                 </ListItem>
                 <Divider variant="inset" component="li" />
-              </>
+              </div>
 
 
               ))}
